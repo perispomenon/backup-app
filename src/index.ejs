@@ -3,10 +3,39 @@
   <head>
     <meta charset="utf-8">
     <title>backup-app</title>
+    <style>
+    /* FIX buttons outline on focus */
+    button:focus {
+      outline: none !important;
+    }
+
+    /* Sticky footer */
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+
+    body {
+      /* Margin bottom by footer height */
+      margin-bottom: 60px;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* Set the fixed height of the footer here */
+      height: 120px;
+      background-color: #f5f5f5;
+    }
+    </style>
     <% if (htmlWebpackPlugin.options.nodeModules) { %>
       <!-- Add `node_modules/` to global paths so `require` works properly in development -->
       <script>
         require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>')
+      </script>
+      <script>
+        $ = jQuery = require('jquery')
       </script>
     <% } %>
   </head>

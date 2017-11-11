@@ -1,5 +1,6 @@
 'use strict'
 
+import path from 'path'
 import { app, BrowserWindow } from 'electron'
 
 /**
@@ -22,8 +23,11 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
-    width: 1000
+    width: 1000,
+    icon: path.join(__static, 'app-icon.png')
   })
+
+  mainWindow.maximize()
 
   mainWindow.loadURL(winURL)
 

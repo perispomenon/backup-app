@@ -11,8 +11,9 @@ export default new Router({
       component: require('@/components/LandingPage').default
     },
     {
-      path: '*',
-      redirect: '/'
+      path: '/create-task',
+      name: 'create-task',
+      component: require('@/components/CreateTask').default
     }
   ]
 })
