@@ -9,6 +9,9 @@
         <li>
           <a title="Редактировать задачу"><span class="glyphicon glyphicon-edit"></span></a>
         </li>
+        <li class="divider-vertical"></li>
+        <li><a title="Запустить задачу"><span class="glyphicon glyphicon-play"></span></a></li>
+        <li class="divider-vertical"></li>        
         <li>
           <a title="Удалить задачу"><span class="glyphicon glyphicon-remove"></span></a>
         </li>

@@ -5,37 +5,21 @@
     <thead>
       <tr>
         <th></th>
-        <th>Номер</th>
-        <th>Номер</th>
-        <th>Номер</th>
+        <th>Название</th>
+        <th>Дата следующего копирования</th>
+        <th>Что-то</th>
         <th>progress</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
+      <tr v-for="task in tasks" :key="task._id">
         <td>
-          <input type="radio" name="task"/>
+          <input type="checkbox" :value="task._id">
         </td>
-        <td>text</td>
-        <td>something</td>
         <td>
-          <div class="progress">
-            <progress-bar :now="5" label="label"></progress-bar>
-          </div>
+          {{task.destination}}
         </td>
-      </tr>
-      <tr>
-        <td>
-          <input type="radio" name="task"/>
-        </td>
-        <td>1</td>
-        <td>text</td>
-        <td>something</td>
-        <td>
-          <div class="progress">
-            <progress-bar :now="5" label></progress-bar>
-          </div>
-        </td>
+        <td>{{task.datetime}}</td>
       </tr>
     </tbody>
   </table>
@@ -47,6 +31,15 @@ import { progressbar } from 'vue-strap'
 export default {
   components: {
     ProgressBar: progressbar
+  },
+  data () {
+    return {
+      tasks: []
+    }
+  },
+  async mounted () {
+    this.tasks = await this.$db.find({ })
+    console.log(this.tasks)
   }
 }
 </script>

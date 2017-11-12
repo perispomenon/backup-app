@@ -8,6 +8,10 @@
       <h4 class="text-center">Настройки</h4>
       <hr/>
       <div class="form-group">
+        <label>Название</label>
+        <input type="text" class="form-control" v-model="name">
+      </div>
+      <div class="form-group">
         <label>Алгоритм копирования:</label>
         <select v-model="algorithm" class="form-control">
           <option value="1">Полное копирование</option>
@@ -31,23 +35,22 @@
       <div class="form-group">
         <label>Носитель</label>
         <select v-model="medium" class="form-control">
-          <option value="1">Локальный диск</option>
-          <option value="2">USB устройство</option>
-          <option value="3">Облако</option>
+          <option value="1">Локальный диск или устройство</option>
+          <option value="2">Облако</option>
         </select>
       </div>
       <div class="form-group">
         <div v-if="medium == 1">
           <label>Выбор директории хранения</label>
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" @click="chooseDestination">Выбрать</button>
+            </span>
+            <input type="text" class="form-control" disabled v-model="destination">
+          </div>
         </div>
         <div v-if="medium == 2">
-          <label>Выбор устройства</label>
-          <select v-model="device" class="form-control">
-            <option value="1">usb-device</option>
-          </select>
-        </div>
-        <div v-if="medium == 3">
-          <label v-if="medium == 3">Выбор облачного хранилища</label>
+          <label>Выбор облачного хранилища</label>
           <select v-model="cloud" class="form-control">
             <option value="1">Dropbox</option>
           </select>
@@ -73,25 +76,37 @@
 </template>
 
 <script>
-const fs = require('fs')
+const fs = require('fs-extra')
 const { dialog } = require('electron').remote
 const moment = require('moment')
 
 const periods = require('../../enums/periods.js')
+const algorithms = require('../../enums/algorithms.js')
+
+const required = [
+  'algorithm',
+  'period',
+  'medium',
+  'name'
+]
 
 export default {
   data () {
     return {
-      algorithm: 1,
-      period: 1,
+      name: null,
+      algorithm: algorithms.full,
+      period: periods.everyDay,
       medium: 1,
       device: 1,
       cloud: 1,
-      directory: '123',
-      files: []
+      files: [],
+      destination: null
     }
   },
   computed: {
+    isValid () {
+      return required.every(r => this[r])
+    },
     datetime () {
       switch (Number(this.period)) {
         case periods.everyDay:
@@ -107,15 +122,28 @@ export default {
     }
   },
   methods: {
-    create () {
-      console.log(this.algorithm, this.period, this.date)
+    async create () {
+      if (!this.isValid || !this.files.length) return
+
+      const task = {
+        files: this.files,
+        algorithm: this.algorithm,
+        datetime: this.datetime,
+        destination: this.destination
+      }
+      await this.$db.insert(task)
       this.$router.back()
     },
-    chooseFiles () {
-      const files = dialog.showOpenDialog({
-        properties: ['openFile', 'openDirectory', 'multiSelections']
+    chooseDestination () {
+      this.destination = dialog.showOpenDialog({
+        properties: ['openDirectory']
       })
-      for (const f of files) {
+    },
+    async chooseFiles () {
+      const inputFiles = dialog.showOpenDialog({
+        properties: ['openFile', 'multiSelections']
+      })
+      for (const f of inputFiles) {
         const isDir = fs.lstatSync(f).isDirectory()
         const isFile = fs.lstatSync(f).isFile()
         isDir
