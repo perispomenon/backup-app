@@ -10,8 +10,8 @@
           <a title="Редактировать задачу"><span class="glyphicon glyphicon-edit"></span></a>
         </li>
         <li class="divider-vertical"></li>
-        <li><a title="Запустить задачу"><span class="glyphicon glyphicon-play"></span></a></li>
-        <li class="divider-vertical"></li>        
+        <li><a title="Запустить задачу"><span class="glyphicon glyphicon-play" @click="backup"></span></a></li>
+        <li class="divider-vertical"></li>
         <li>
           <a title="Удалить задачу"><span class="glyphicon glyphicon-remove"></span></a>
         </li>
@@ -29,11 +29,27 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Settings from '@/components/Settings'
+import $ from 'jquery'
 
 export default {
   components: {
     Settings
+  },
+  computed: {
+    ...mapState({
+      tasks: state => state.tasks.all
+    })
+  },
+  methods: {
+    async backup () {
+      const $checked = $('input[type="checkbox"]:checked')
+      // TODO сообщения об ошибках
+      if (!$checked.length) { return }
+      const id = $checked.val()
+      await this.$store.dispatch('backup', id)
+    }
   }
 }
 </script>

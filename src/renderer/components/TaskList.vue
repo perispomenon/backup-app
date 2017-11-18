@@ -16,10 +16,8 @@
         <td>
           <input type="checkbox" :value="task._id">
         </td>
-        <td>
-          {{task.destination}}
-        </td>
-        <td>{{task.datetime}}</td>
+        <td>{{ task.name }}</td>
+        <td>{{ new Date(task.datetime).toLocaleString('ru') }}</td>
       </tr>
     </tbody>
   </table>
@@ -27,19 +25,24 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { progressbar } from 'vue-strap'
+
 export default {
   components: {
     ProgressBar: progressbar
   },
   data () {
     return {
-      tasks: []
     }
   },
+  computed: {
+    ...mapState({
+      tasks: state => state.tasks.all
+    })
+  },
   async mounted () {
-    this.tasks = await this.$db.find({ })
-    console.log(this.tasks)
+    await this.$store.dispatch('getAllTasks')
   }
 }
 </script>

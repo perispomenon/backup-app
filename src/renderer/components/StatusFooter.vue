@@ -19,7 +19,7 @@ import moment from 'moment'
 export default {
   data () {
     return {
-      statusString: moment().format('DD-MM-YY HH:mm:ss').toString() + '... Приложение запущено'
+      statusString: moment().format('lll').toString() + '... Приложение запущено'
     }
   }
 }

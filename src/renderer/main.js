@@ -5,8 +5,11 @@ import App from './App'
 import router from './router'
 import store from './store'
 import db from './datastore'
+import moment from 'moment'
 
 import 'bootstrap/dist/css/bootstrap.css'
+
+moment.locale('ru')
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

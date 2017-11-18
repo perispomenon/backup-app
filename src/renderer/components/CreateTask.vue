@@ -79,6 +79,7 @@
 const fs = require('fs-extra')
 const { dialog } = require('electron').remote
 const moment = require('moment')
+const hasha = require('hasha')
 
 const periods = require('../../enums/periods.js')
 const algorithms = require('../../enums/algorithms.js')
@@ -126,6 +127,7 @@ export default {
       if (!this.isValid || !this.files.length) return
 
       const task = {
+        name: this.name,
         files: this.files,
         algorithm: this.algorithm,
         datetime: this.datetime,
@@ -135,20 +137,35 @@ export default {
       this.$router.back()
     },
     chooseDestination () {
-      this.destination = dialog.showOpenDialog({
+      const destination = dialog.showOpenDialog({
         properties: ['openDirectory']
       })
+      // Потому что dialog.showOpenDialog всегда возвращает массив.
+      this.destination = destination[0]
     },
     async chooseFiles () {
       const inputFiles = dialog.showOpenDialog({
         properties: ['openFile', 'multiSelections']
       })
       for (const f of inputFiles) {
-        const isDir = fs.lstatSync(f).isDirectory()
-        const isFile = fs.lstatSync(f).isFile()
-        isDir
-          ? this.files.push({ name: f, isDir, isFile: false })
-          : this.files.push({ name: f, isDir: false, isFile })
+        if (this.files.map(f => f.name).includes(f)) { continue }
+
+        const fStats = fs.lstatSync(f)
+        const texty = f + fStats.size + fStats.mtime + fStats.mode
+        const hash = hasha(texty, { algorithm: 'md5' })
+
+        const file = {
+          name: f,
+          stats: fStats,
+          hash
+        }
+        if (fStats.isDirectory()) {
+          file.isDir = true
+        } else {
+          file.isFile = true
+        }
+
+        this.files.push(file)
       }
     },
     remove () {
