@@ -19,7 +19,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "backup-app",
+    "productName": "Программа резервного копирования информации",
     "appId": "org.simulatedgreg.electron-vue",
     "directories": {
       "output": "build"
@@ -61,6 +61,7 @@
     "moment": "^2.19.1",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
+    "tar": "^4.0.2",
     "vue": "^2.3.3",
     "vue-electron": "^1.0.6",
     "vue-router": "^2.5.3",

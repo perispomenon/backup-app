@@ -81,8 +81,10 @@ const { dialog } = require('electron').remote
 const moment = require('moment')
 const hasha = require('hasha')
 
-const periods = require('../../enums/periods.js')
-const algorithms = require('../../enums/algorithms.js')
+const { periods } = require('../../enums/periods.js')
+const { algorithms } = require('../../enums/algorithms.js')
+
+moment.locale('ru')
 
 const required = [
   'algorithm',
@@ -99,7 +101,6 @@ export default {
       algorithm: algorithms.full,
       period: periods.everyDay,
       medium: 1,
-      device: 1,
       cloud: 1,
       files: [],
       destination: null
@@ -132,7 +133,10 @@ export default {
         files: this.files,
         algorithm: this.algorithm,
         datetime: this.datetime,
-        destination: this.destination
+        destination: this.destination,
+        period: this.period,
+        medium: this.medium,
+        cloud: this.cloud
       }
       await this.$db.insert(task)
       this.$router.back()

@@ -14,7 +14,7 @@
     <tbody>
       <tr v-for="task in tasks" :key="task._id">
         <td>
-          <input type="checkbox" :value="task._id" @click="chooseTask(task._id)">
+          <input type="checkbox" :value="task._id" name="task" @change="deselect" @click="chooseTask(task._id)">
         </td>
         <td>{{ task.name }}</td>
         <td>{{ new Date(task.datetime).toLocaleString('ru') }}</td>
@@ -46,6 +46,11 @@ export default {
     await this.$store.dispatch('getAllTasks')
   },
   methods: {
+    deselect () {
+      $('input[type="checkbox"]').on('change', function () {
+        $('input[name="' + this.name + '"]').not(this).prop('checked', false)
+      })
+    },
     chooseTask (id) {
       const $checkbox = $(`input[type="checkbox"][value="${id}"]`)
       if ($checkbox.is(':checked')) {

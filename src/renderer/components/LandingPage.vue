@@ -10,7 +10,7 @@
       </div>
     </div>
   </div>
-  <status-footer></status-footer>
+  <!-- <status-footer></status-footer> -->
 </div>
 </template>
 
