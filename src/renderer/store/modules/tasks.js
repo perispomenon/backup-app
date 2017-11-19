@@ -3,7 +3,7 @@ import backup from '../../functions/backup'
 
 const state = {
   all: [],
-  chosen: null
+  chosen: null 
 }
 
 const mutations = {
