@@ -31,7 +31,7 @@
 <script>
 import { mapState } from 'vuex'
 import Settings from '@/components/Settings'
-import $ from 'jquery'
+// import $ from 'jquery'
 
 export default {
   components: {
@@ -39,16 +39,14 @@ export default {
   },
   computed: {
     ...mapState({
-      tasks: state => state.tasks.all
+      tasks: state => state.tasks.all,
+      chosenTask: state => state.tasks.chosen
     })
   },
   methods: {
     async backup () {
-      const $checked = $('input[type="checkbox"]:checked')
-      // TODO сообщения об ошибках
-      if (!$checked.length) { return }
-      const id = $checked.val()
-      await this.$store.dispatch('backup', id)
+      if (!this.chosenTask) { return }
+      await this.$store.dispatch('backup', this.chosenTask)
     }
   }
 }

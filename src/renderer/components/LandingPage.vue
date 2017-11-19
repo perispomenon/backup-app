@@ -2,10 +2,10 @@
 <div>
   <div class="container">
     <div class="row">
-      <div class="col-xs-8">
+      <div class="col-xs-6">
         <task-list></task-list>
       </div>
-      <div class="col-xs-4">
+      <div class="col-xs-6">
         <task-info></task-info>
       </div>
     </div>

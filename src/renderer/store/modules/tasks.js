@@ -2,12 +2,16 @@ import db from '../../datastore'
 import backup from '../../functions/backup'
 
 const state = {
-  all: []
+  all: [],
+  chosen: null
 }
 
 const mutations = {
   TASKS_ALL (state, data) {
     state.all = data
+  },
+  TASK_CHOOSE (state, id) {
+    state.chosen = id
   }
 }
 

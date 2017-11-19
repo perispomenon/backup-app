@@ -92,6 +92,7 @@ const required = [
 ]
 
 export default {
+  props: ['mode'],
   data () {
     return {
       name: null,

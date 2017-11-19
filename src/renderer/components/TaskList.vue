@@ -14,7 +14,7 @@
     <tbody>
       <tr v-for="task in tasks" :key="task._id">
         <td>
-          <input type="checkbox" :value="task._id">
+          <input type="checkbox" :value="task._id" @click="chooseTask(task._id)">
         </td>
         <td>{{ task.name }}</td>
         <td>{{ new Date(task.datetime).toLocaleString('ru') }}</td>
@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import { mapState } from 'vuex'
 import { progressbar } from 'vue-strap'
 
@@ -43,10 +44,23 @@ export default {
   },
   async mounted () {
     await this.$store.dispatch('getAllTasks')
+  },
+  methods: {
+    chooseTask (id) {
+      const $checkbox = $(`input[type="checkbox"][value="${id}"]`)
+      if ($checkbox.is(':checked')) {
+        this.$store.commit('TASK_CHOOSE', id)
+      } else {
+        this.$store.commit('TASK_CHOOSE', null)
+      }
+    }
   }
 }
 </script>
 
 <style>
-
+input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+}
 </style>

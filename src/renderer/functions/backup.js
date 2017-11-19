@@ -1,6 +1,5 @@
 'use strict'
 const moment = require('moment')
-// const fs = require('fs')
 const fse = require('fs-extra')
 
 export default {
