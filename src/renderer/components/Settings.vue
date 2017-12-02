@@ -1,24 +1,31 @@
 <template>
-<div id="settings" role="dialog" class="modal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button data-dismiss="modal" aria-label="close" class="close"><span aria-hidden="true">&times;</span></button>
-        <h4>Настройки приложения</h4>
-      </div>
-      <div class="modal-body">crap</div>
-      <div class="modal-footer">
-        <button data-dismiss="modal" class="btn btn-default">Отменить</button>
-        <button class="btn btn-primary">Сохранить</button>
-      </div>
+<div id="settings" class="container">
+  <h3 class="text-center">Настройки приложения</h3>
+  <div class="row">
+    <div class="col-xs-8 col-xs-offset-2">
+      <div class="form-group"><label>Количество хранимых точек восстановления</label><input type="number" min="1" step="1" class="form-control"></div>
+      <div class="form-group"><label>Фильтр (файлы и директории, подходящие под этот фильтр никогда не будут копироваться)</label><input type="text" class="form-control"></div>
+      <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
+      <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
+      <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
+      <button class="btn btn-danger" @click="this.$router.back()">Отмена</button>
+      <button class="btn btn-primary pull-right" @click="save">Сохранить</button>
     </div>
   </div>
+  
 </div>
 </template>
 
 <script>
 export default {
-
+  data () {
+    return {}
+  },
+  methods: {
+    save () {
+      console.log('saving settings')
+    }
+  }
 }
 </script>
 

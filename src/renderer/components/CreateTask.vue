@@ -64,10 +64,17 @@
       <hr/>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h5>Выбрано:<a title="Добавить" @click="chooseFiles" class="pull-right"><span class="glyphicon glyphicon-plus"></span></a><a title="Удалить" @click="remove" class="pull-right"><span class="glyphicon glyphicon-remove"></span></a></h5>
+          <h5>Выбрано:
+            <a title="Добавить файлы" @click="chooseFiles('file')" class="pull-right choice-items"><span class="glyphicon glyphicon-file"></span></a>
+            <a title="Добавить директории" @click="chooseFiles('dir')" class="pull-right choice-items"><span class="glyphicon glyphicon-folder-open"></span></a>
+            <a title="Удалить" @click="clearSelection" class="pull-right choice-items"><span class="glyphicon glyphicon-remove"></span></a>
+          </h5>
         </div>
         <div class="panel-body">
-          <div v-for="file in files" :key="file.name">{{file.name}}</div>
+          <div v-for="file in files" :key="file.name">
+            <span :class="`glyphicon glyphicon-${file.isFile ? 'file' : 'folder-close'}`"></span>
+            {{file.name}}
+          </div>
         </div>
       </div>
     </div>
@@ -148,10 +155,17 @@ export default {
       // Потому что dialog.showOpenDialog всегда возвращает массив.
       this.destination = destination[0]
     },
-    async chooseFiles () {
+    async chooseFiles (type) {
+      const dialogPropeties = ['multiSelections']
+      if (type === 'file') {
+        dialogPropeties.push('openFile')
+      } else {
+        dialogPropeties.push('openDirectory')
+      }
       const inputFiles = dialog.showOpenDialog({
-        properties: ['openFile', 'multiSelections']
+        properties: dialogPropeties
       })
+
       for (const f of inputFiles) {
         if (this.files.map(f => f.name).includes(f)) { continue }
 
@@ -173,12 +187,18 @@ export default {
         this.files.push(file)
       }
     },
-    remove () {
+    clearSelection () {
+      this.files = []
     }
   }
 }
 </script>
 
 <style>
-
+.choice-items {
+  padding-right: 15px;
+}
+.choice-items:first-child {
+  padding-right: 0;
+}
 </style>

@@ -3,7 +3,7 @@
   <div class="panel-heading">
     <h6>Информация о задаче РК</h6>
   </div>
-  <div class="panel-body" v-if="chosenTask">
+  <div class="panel-body" v-if="task">
     <label>
       Название: <span class="lighter">{{ this.task.name }}</span>
     </label>
