@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col-xs-8">
           <div class="form-group"></div>
-          <textarea disabled="disabled" rows="4" v-model="statusString" class="form-control"></textarea>
+          <textarea disabled rows="4" v-model="statusString" class="form-control"></textarea>
         </div>
       </div>
     </div>

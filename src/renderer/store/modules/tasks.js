@@ -17,11 +17,11 @@ const mutations = {
 
 const actions = {
   async getAllTasks ({ commit }) {
-    const data = await db.find({})
+    const data = await db.tasks.find({})
     commit('TASKS_ALL', data)
   },
   async backup ({ commit }, id) {
-    const task = await db.findOne({_id: id})
+    const task = await db.tasks.findOne({_id: id})
     await backup.do(task)
   }
 }

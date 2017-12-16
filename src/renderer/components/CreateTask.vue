@@ -1,7 +1,10 @@
 <template>
 <div class="container">
   <header>
-    <h4 class="text-center"><strong>Создание новой задачи резервного копирования</strong></h4>
+    <h4 class="text-center">
+      <strong v-if="!isReadOnly">Создание новой задачи резервного копирования</strong>
+      <strong v-else>Редактирование задачи резервного копирования</strong>
+    </h4>
   </header>
   <div class="row">
     <div class="col-xs-6">
@@ -94,7 +97,7 @@ const required = [
 ]
 
 export default {
-  props: ['mode'],
+  props: ['isReadOnly'],
   data () {
     return {
       name: null,
@@ -124,6 +127,8 @@ export default {
       }
     }
   },
+  mounted () {
+  },
   methods: {
     async create () {
       if (!this.isValid || !this.files.length) return
@@ -138,7 +143,7 @@ export default {
         medium: this.medium,
         cloud: this.cloud
       }
-      await this.$db.insert(task)
+      await this.$db.tasks.insert(task)
       this.$router.back()
     },
     chooseDestination () {
@@ -156,7 +161,7 @@ export default {
         if (this.files.map(f => f.name).includes(f)) { continue }
 
         const fStats = fs.lstatSync(f)
-        const texty = f + fStats.size + fStats.mtime + fStats.mode
+        const texty = f + fStats.size + fStats.mtime
         const hash = hasha(texty, { algorithm: 'md5' })
 
         const file = {
