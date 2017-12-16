@@ -8,7 +8,7 @@
       <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
       <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
       <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
-      <button class="btn btn-danger" @click="this.$router.back()">Отмена</button>
+      <button class="btn btn-danger" @click="$router.back()">Отмена</button>
       <button class="btn btn-primary pull-right" @click="save">Сохранить</button>
     </div>
   </div>

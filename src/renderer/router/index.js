@@ -19,6 +19,11 @@ export default new Router({
       path: '/settings',
       name: 'settings',
       component: require('@/components/Settings').default
+    },
+    {
+      path: '/restore',
+      name: 'restore',
+      component: require('@/components/Restore').default
     }
   ]
 })

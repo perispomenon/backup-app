@@ -15,7 +15,7 @@ export default {
     //   const copyName = destination + '/' + f.name
     //   await fse.copy(f.name, copyName)
     // })
-    console.log(destination)
     await tar.c({ file: destination, gzip: true }, task.files.map(f => f.name))
+    console.log('created backup')
   }
 }

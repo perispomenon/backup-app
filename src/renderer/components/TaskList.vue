@@ -1,14 +1,12 @@
 <template>
 <div class="table-responsive">
   <table class="table table-striped">
-    <caption>Настроенные задачи резервного копирования</caption>
+    <caption class="text-center">Настроенные задачи резервного копирования</caption>
     <thead>
       <tr>
         <th></th>
         <th>Название</th>
         <th>Дата следующего копирования</th>
-        <th>Что-то</th>
-        <th>progress</th>
       </tr>
     </thead>
     <tbody>
@@ -39,7 +37,8 @@ export default {
   },
   computed: {
     ...mapState({
-      tasks: state => state.tasks.all
+      tasks: state => state.tasks.all,
+      chosenTask: state => state.tasks.chosen
     })
   },
   async mounted () {

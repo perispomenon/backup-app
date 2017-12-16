@@ -1,7 +1,7 @@
 <template>
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h6>Информация о задаче РК</h6>
+    <h6 class="text-center">Информация о задаче РК</h6>
   </div>
   <div class="panel-body" v-if="task">
     <label>

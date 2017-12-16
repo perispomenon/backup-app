@@ -100,7 +100,8 @@ const required = [
   'algorithm',
   'period',
   'medium',
-  'name'
+  'name',
+  'destination'
 ]
 
 export default {

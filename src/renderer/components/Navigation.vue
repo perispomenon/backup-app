@@ -7,10 +7,18 @@
           <a @click="$router.push('create-task')" title="Создать задачу"><span class="glyphicon glyphicon-plus"></span></a>
         </li>
         <li>
-          <a title="Редактировать задачу"><span class="glyphicon glyphicon-edit"></span></a>
+          <a title="Редактировать задачу">
+            <span class="glyphicon glyphicon-edit"></span>
+          </a>
         </li>
         <li class="divider-vertical"></li>
-        <li><a title="Запустить задачу"><span class="glyphicon glyphicon-play" @click="backup"></span></a></li>
+        <li>
+          <a title="Запустить задачу"><span class="glyphicon glyphicon-play" :data-toggle="chosenTask ? 'modal' : ''" data-target="#point-parameters"></span>
+          </a>
+        </li>
+        <li>
+          <router-link :to="{ name: 'restore', params: { chosenTask } }" title="Восстановить данные"><span class="glyphicon glyphicon-hourglass"></span></router-link>
+        </li>
         <li class="divider-vertical"></li>
         <li>
           <a title="Удалить задачу" @click="removeTask"><span class="glyphicon glyphicon-trash"></span></a>
@@ -23,17 +31,19 @@
       </ul>
     </div>
   </nav>
+  <point-modal></point-modal>
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import Settings from '@/components/Settings'
-// import $ from 'jquery'
+import PointModal from '@/components/PointModal'
 
 export default {
   components: {
-    Settings
+    Settings,
+    PointModal
   },
   computed: {
     ...mapState({
@@ -42,12 +52,8 @@ export default {
     })
   },
   methods: {
-    async backup () {
-      if (!this.chosenTask) { return }
-      await this.$store.dispatch('backup', this.chosenTask)
-    },
     async removeTask () {
-      await this.$db.remove({ _id: this.chosenTask })
+      await this.$db.tasks.remove({ _id: this.chosenTask })
       await this.$store.dispatch('getAllTasks')
     }
   }
