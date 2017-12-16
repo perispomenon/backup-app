@@ -14,6 +14,11 @@ export default new Router({
       path: '/create-task',
       name: 'create-task',
       component: require('@/components/CreateTask').default
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: require('@/components/Settings').default
     }
   ]
 })

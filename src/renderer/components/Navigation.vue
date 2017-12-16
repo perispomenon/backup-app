@@ -13,18 +13,16 @@
         <li><a title="Запустить задачу"><span class="glyphicon glyphicon-play" @click="backup"></span></a></li>
         <li class="divider-vertical"></li>
         <li>
-          <a title="Удалить задачу"><span class="glyphicon glyphicon-remove"></span></a>
+          <a title="Удалить задачу" @click="removeTask"><span class="glyphicon glyphicon-trash"></span></a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-          <a title="Настройки" data-toggle="modal" data-target="#settings"><span class="glyphicon glyphicon-cog"></span></a>
+          <a @click="$router.push('settings')" title="Настройки"><span class="glyphicon glyphicon-cog"></span></a>
         </li>
       </ul>
     </div>
   </nav>
-
-  <settings></settings>
 </div>
 </template>
 
@@ -47,6 +45,10 @@ export default {
     async backup () {
       if (!this.chosenTask) { return }
       await this.$store.dispatch('backup', this.chosenTask)
+    },
+    async removeTask () {
+      await this.$db.remove({ _id: this.chosenTask })
+      await this.$store.dispatch('getAllTasks')
     }
   }
 }
