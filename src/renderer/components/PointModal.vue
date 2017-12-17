@@ -44,8 +44,8 @@ export default {
       }
 
       const task = await this.$db.tasks.findOne({ _id: this.chosenTask })
-      const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
-      const filename = task.destination + '/' + task.name + ': ' + this.pointName + ' ' + timestamp + '.tgz'
+      const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
+      const filename = task.destination + '/' + task.name + '_' + this.pointName + '_' + timestamp + '.tgz'
       const point = {
         taskId: task._id,
         name: this.pointName,
