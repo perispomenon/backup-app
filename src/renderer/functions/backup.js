@@ -1,21 +1,16 @@
 'use strict'
-const moment = require('moment')
-// const fse = require('fs-extra')
 const tar = require('tar')
 
 export default {
-  do: async function (task) {
-    // TODO проверки всякой хуйни
-    const destination = task.destination + '/' +
-      task.name + '_' +
-      moment(task.datetime).format('YYYYMMDD-hhmmss') + '.tgz'
+  do: async function (params) {
+    const task = params.task
+    const filename = params.filename
 
-    // await fse.ensureDir(destination)
-    // task.files.forEach(async f => {
-    //   const copyName = destination + '/' + f.name
-    //   await fse.copy(f.name, copyName)
-    // })
-    await tar.c({ file: destination, gzip: true }, task.files.map(f => f.name))
+    if (!task.files.length) {
+      console.error('No files to backup')
+    }
+
+    await tar.c({ file: filename, gzip: true }, task.files.map(f => f.name))
     console.log('created backup')
   }
 }

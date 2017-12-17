@@ -1,5 +1,6 @@
 import db from '../../datastore'
 import backup from '../../functions/backup'
+import restore from '../../functions/restore'
 
 const state = {
   all: [],
@@ -20,9 +21,11 @@ const actions = {
     const data = await db.tasks.find({})
     commit('TASKS_ALL', data)
   },
-  async backup ({ commit }, id) {
-    const task = await db.tasks.findOne({_id: id})
-    await backup.do(task)
+  async backup ({ commit }, params) {
+    await backup.do(params)
+  },
+  async restore ({ commit }, pointId) {
+    await restore.do(pointId)
   }
 }
 

@@ -28,6 +28,11 @@
         <li>
           <a @click="$router.push('settings')" title="Настройки"><span class="glyphicon glyphicon-cog"></span></a>
         </li>
+        <li>
+          <router-link :to="{ name: 'landing-page' }" title="На главный экран">
+            <span class="glyphicon glyphicon-home"></span>
+          </router-link>
+        </li>
       </ul>
     </div>
   </nav>

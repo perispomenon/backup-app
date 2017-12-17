@@ -8,7 +8,7 @@
       <div class="form-group">
         <label>Точка восстановления</label>
         <select class="form-control" v-model="selectedPoint">
-          <option v-for="taskPoint of taskPoints" :key="taskPoint._id" :value="taskPoint._id">
+          <option v-for="taskPoint in taskPoints" :key="taskPoint._id" :value="taskPoint._id">
             {{ taskPoint.name }}
           </option>
         </select>
@@ -17,7 +17,7 @@
   </div>
   <div>
     <button class="btn btn-danger" @click="$router.back()">Отмена</button>
-    <button class="btn btn-primary">Восстановить</button>
+    <button class="btn btn-primary" @click="restore">Восстановить</button>
   </div>
 </div>
 </template>
@@ -40,7 +40,9 @@ export default {
     await this.$store.dispatch('getTaskPoints', this.$route.params.chosenTask)
   },
   methods: {
-
+    async restore () {
+      await this.$store.dispatch('restore', this.selectedPoint)
+    }
   }
 }
 </script>

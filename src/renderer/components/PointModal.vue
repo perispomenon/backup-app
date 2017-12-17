@@ -8,11 +8,11 @@
       <div class="modal-body">
         <div class="form-group">
           <label>Название точки восстановления</label>
-          <input class="form-control" v-model="pointName" type="text">
+          <input class="form-control" v-model="pointName" type="text" maxlength="100">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" @click="backup" data-dismiss="modal">Запустить</button>
+        <button class="btn btn-primary" @click="backup">Запустить</button>
         <button class="btn btn-danger" data-dismiss="modal">Отмена</button>
       </div>
     </div>
@@ -22,6 +22,8 @@
 
 <script>
 import { mapState } from 'vuex'
+import moment from 'moment'
+
 export default {
   data () {
     return {
@@ -37,12 +39,20 @@ export default {
   },
   methods: {
     async backup () {
+      if (!this.pointName) {
+        return
+      }
+
+      const task = await this.$db.tasks.findOne({ _id: this.chosenTask })
+      const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
+      const filename = task.destination + '/' + task.name + ': ' + this.pointName + ' ' + timestamp + '.tgz'
       const point = {
-        taskId: this.chosenTask,
-        name: this.pointName
+        taskId: task._id,
+        name: this.pointName,
+        filename: filename
       }
       await this.$db.points.insert(point)
-      await this.$store.dispatch('backup', this.chosenTask)
+      await this.$store.dispatch('backup', { task, filename })
     }
   }
 }
