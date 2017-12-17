@@ -1,7 +1,9 @@
 'use strict'
 
 import path from 'path'
-import { app, BrowserWindow, Tray, Menu } from 'electron'
+import { app, BrowserWindow, Tray, Menu, ipcMain } from 'electron'
+import schedule from 'node-schedule'
+import notifier from 'node-notifier'
 
 /**
  * Set `__static` path to static files in production
@@ -71,6 +73,15 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
+  }
+})
+
+ipcMain.on('scheduleJobs', (event, tasks) => {
+  // TODO сделать периодичность
+  for (const task of tasks) {
+    schedule.scheduleJob(task.datetime, () => {
+      notifier.notify('Сейчас будет выполнено резервное копирование ' + task.name)
+    })
   }
 })
 
