@@ -1,20 +1,14 @@
 <template>
-<div id="point-parameters" class="modal" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4>Создание точки восстановления</h4>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-8 col-xs-offset-2">
+      <h4>Создание точки восстановления</h4>
+      <div class="form-group">
+        <label>Название точки восстановления</label>
+        <input class="form-control" v-model="pointName" type="text" maxlength="100">
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Название точки восстановления</label>
-          <input class="form-control" v-model="pointName" type="text" maxlength="100">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" @click="backup">Запустить</button>
-        <button class="btn btn-danger" data-dismiss="modal">Отмена</button>
-      </div>
+      <button class="btn btn-primary" @click="backup">Запустить</button>
+      <button class="btn btn-danger" @click="$router.back()">Отмена</button>
     </div>
   </div>
 </div>

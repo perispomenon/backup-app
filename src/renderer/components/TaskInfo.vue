@@ -5,16 +5,19 @@
   </div>
   <div class="panel-body" v-if="task">
     <label>
-      Название: <span class="lighter">{{ this.task.name }}</span>
+      Название: <span class="lighter">{{ task.name }}</span>
     </label>
     <label>
-      Алгоритм: <span class="lighter">{{ this.algorithmName }}</span>
+      Алгоритм: <span class="lighter">{{ algorithmName }}</span>
     </label>
     <label>
-      Периодичность: <span class="lighter">{{ this.periodName }}</span>
+      Периодичность: <span class="lighter">{{ periodName }}</span>
     </label>
     <label>
-      Носитель: <span class="lighter">{{ this.mediumName }}</span>
+      Последняя точка восстановления: <span class="lighter"></span>
+    </label>
+    <label>
+      Носитель: <span class="lighter">{{ mediumName }}</span>
     </label>
     <label>
       {{ Number(this.task.medium) === 1

@@ -24,6 +24,11 @@ export default new Router({
       path: '/restore',
       name: 'restore',
       component: require('@/components/Restore').default
+    },
+    {
+      path: '/point-backup',
+      name: 'point-backup',
+      component: require('@/components/PointBackup').default
     }
   ]
 })

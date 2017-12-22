@@ -4,7 +4,7 @@
     <div class="container">
       <ul class="nav navbar-nav">
         <li>
-          <a @click="$router.push('create-task')" title="Создать задачу"><span class="glyphicon glyphicon-plus"></span></a>
+          <router-link :to="{ name: 'create-task' }" title="Создать задачу"><span class="glyphicon glyphicon-plus"></span></router-link>
         </li>
         <li>
           <a title="Редактировать задачу">
@@ -13,14 +13,17 @@
         </li>
         <li class="divider-vertical"></li>
         <li>
-          <a title="Запустить задачу"><span class="glyphicon glyphicon-play" :data-toggle="chosenTask ? 'modal' : ''" data-target="#point-parameters"></span>
-          </a>
+          <router-link :to="{ name: 'point-backup' }" title="Запустить задачу">
+            <span class="glyphicon glyphicon-play"></span>
+          </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'restore', params: { chosenTask } }" title="Восстановить данные"><span class="glyphicon glyphicon-hourglass"></span></router-link>
+          <router-link :to="{ name: 'restore', params: { chosenTask } }" title="Восстановить данные">
+            <span class="glyphicon glyphicon-hourglass"></span>
+          </router-link>
         </li>
         <li class="divider-vertical"></li>
-        <li>
+        <li style="cursor: pointer">
           <a title="Удалить задачу" @click="removeTask"><span class="glyphicon glyphicon-trash"></span></a>
         </li>
       </ul>
@@ -36,19 +39,16 @@
       </ul>
     </div>
   </nav>
-  <point-modal></point-modal>
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import Settings from '@/components/Settings'
-import PointModal from '@/components/PointModal'
 
 export default {
   components: {
-    Settings,
-    PointModal
+    Settings
   },
   computed: {
     ...mapState({
