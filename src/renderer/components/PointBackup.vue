@@ -16,7 +16,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import moment from 'moment'
 
 export default {
   data () {
@@ -33,20 +32,9 @@ export default {
   },
   methods: {
     async backup () {
-      if (!this.pointName) {
-        return
-      }
-
+      if (!this.pointName) { return }
       const task = await this.$db.tasks.findOne({ _id: this.chosenTask })
-      const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
-      const filename = task.destination + '/' + task.name + '_' + this.pointName + '_' + timestamp + '.tgz'
-      const point = {
-        taskId: task._id,
-        name: this.pointName,
-        filename: filename
-      }
-      await this.$db.points.insert(point)
-      await this.$store.dispatch('backup', { task, filename })
+      await this.$store.dispatch('backup', { task, pointName: this.pointName })
     }
   }
 }

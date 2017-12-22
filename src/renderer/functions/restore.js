@@ -6,6 +6,6 @@ export default {
   do: async function (pointId) {
     const point = await db.points.findOne({ _id: pointId })
     await tar.x({ file: point.filename, cwd: '/' })
-    console.log('restored from backup')
+    console.log('restored from backup ' + point.filename)
   }
 }
