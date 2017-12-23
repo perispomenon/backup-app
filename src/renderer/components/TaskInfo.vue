@@ -13,6 +13,9 @@
     <label>
       Периодичность: <span class="lighter">{{ periodName }}</span>
     </label>
+    <label v-show="task.period == 4">
+      Период: <span class="lighter">{{ task.cron }}</span>
+    </label>
     <label>
       Последняя точка восстановления: <span class="lighter"></span>
     </label>

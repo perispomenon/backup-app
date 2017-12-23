@@ -32,8 +32,8 @@
         </select>
       </div>
       <div v-if="period == 4" class="form-group">
-        <label>Дата следующего копирования</label>
-        <input type="datetime-local" v-model="datetime" class="form-control"/>
+        <label>Период копирования (в формате Cron)</label>
+        <input type="text" v-model="cron" class="form-control"/>
       </div>
       <div class="form-group">
         <label>Носитель</label>
@@ -91,7 +91,7 @@ const { dialog } = require('electron').remote
 const moment = require('moment')
 const hasha = require('hasha')
 
-const { periods } = require('../../enums/periods.js')
+const { periods, getCron } = require('../../enums/periods.js')
 const { algorithms } = require('../../enums/algorithms.js')
 
 moment.locale('ru')
@@ -114,7 +114,8 @@ export default {
       medium: 1,
       cloud: 1,
       files: [],
-      destination: null
+      destination: null,
+      cron: null
     }
   },
   computed: {
@@ -130,8 +131,6 @@ export default {
           return moment().add(1, 'week').format('YYYY-MM-DDThh:mm')
         case periods.everyMonth:
           return moment().add(1, 'month').format('YYYY-MM-DDThh:mm')
-        default:
-          return 'crap'
       }
     }
   },
@@ -145,7 +144,8 @@ export default {
         name: this.name,
         files: this.files,
         algorithm: this.algorithm,
-        datetime: moment().add(1, 'minute').format(),
+        datetime: moment().add(30, 'second').format(),
+        cron: this.period === '4' ? this.cron : getCron(this.period),
         destination: this.destination,
         period: this.period,
         medium: this.medium,

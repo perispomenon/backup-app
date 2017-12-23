@@ -9,10 +9,6 @@ const { getFileHash } = require('../functions/helpers').default
 export default {
   async do (params) {
     const task = params.task
-    if (!task.files.length) {
-      console.error('No files to backup')
-    }
-
     const point = this.prepareAny(task, params.pointName)
 
     switch (Number(task.algorithm)) {
@@ -25,8 +21,11 @@ export default {
       case algorithms.differential:
         await this.prepareDifferential(task, point)
         break
-      default:
-        console.error('bad algorithm')
+    }
+
+    if (!point.files.length) {
+      console.error('Нет изменений для резервирования')
+      return
     }
 
     console.log(point)
@@ -46,7 +45,7 @@ export default {
     point.previous = points.length ? points[0]._id : null
 
     let pointFiles = []
-    if (point.previous) {
+    if (point.previous) { // Дифференциальная копия.
       const previousPoint = await db.points.findOne({ _id: point.previous })
 
       for (const file of previousPoint.files) {
@@ -56,7 +55,7 @@ export default {
       }
 
       pointFiles = this.removeUnchangedFiles(pointFiles, previousPoint.files)
-    } else {
+    } else { // Полная копия в дифференциальной.
       for (const file of task.files.map(f => f.name)) {
         const attrs = fs.lstatSync(file)
         const hash = getFileHash(file, attrs)
@@ -76,10 +75,7 @@ export default {
     }
   },
   removeUnchangedFiles (currentFiles, previousFiles) {
-    console.log('suka ebanaya')
-    console.log(currentFiles)
-    let changedFiles = currentFiles
+    return currentFiles
       .filter(cf => !previousFiles.map(pf => pf.hash).includes(cf.hash))
-    return changedFiles
   }
 }

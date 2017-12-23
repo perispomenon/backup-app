@@ -30,8 +30,7 @@ function createWindow () {
     height: 650,
     useContentSize: true,
     width: 1200,
-    icon: iconPath,
-    title: title
+    icon: iconPath
   })
 
   // mainWindow.maximize()
@@ -77,10 +76,12 @@ app.on('activate', () => {
 })
 
 ipcMain.on('scheduleJobs', (event, tasks) => {
-  // TODO сделать периодичность
   for (const task of tasks) {
-    schedule.scheduleJob(task.datetime, () => {
-      notifier.notify('Сейчас будет выполнено резервное копирование ' + task.name)
+    schedule.scheduleJob(task.cron, () => {
+      notifier.notify({
+        title: 'Резервное копирование',
+        message: 'Сейчас будет выполнено запланированное резервное копирование ' + task.name
+      })
     })
   }
 })

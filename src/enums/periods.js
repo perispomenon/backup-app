@@ -20,7 +20,20 @@ function getPeriodName (id) {
   }
 }
 
+// FOR TESTING YET
+function getCron (id) {
+  switch (Number(id)) {
+    case 1:
+      return '@daily'
+    case 2:
+      return '@weekly'
+    case 3:
+      return '@monthly'
+  }
+}
+
 module.exports = {
   periods,
-  getPeriodName
+  getPeriodName,
+  getCron
 }
