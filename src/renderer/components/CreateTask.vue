@@ -79,6 +79,9 @@
             {{file.name}}
           </div>
         </div>
+        <div class="panel-footer">
+          <label>Общий размер: {{ selectedFilesSize.toFixed(2) }} МБ</label>
+        </div>
       </div>
     </div>
   </div>
@@ -90,6 +93,7 @@ const fs = require('fs-extra')
 const { dialog } = require('electron').remote
 const moment = require('moment')
 const hasha = require('hasha')
+const getSize = require('get-folder-size')
 
 const { periods, getCron } = require('../../enums/periods.js')
 const { algorithms } = require('../../enums/algorithms.js')
@@ -132,6 +136,9 @@ export default {
         case periods.everyMonth:
           return moment().add(1, 'month').format('YYYY-MM-DDThh:mm')
       }
+    },
+    selectedFilesSize () {
+      return this.files.reduce((s, c) => s + c.stats.size / 1024 / 1024, 0)
     }
   },
   mounted () {
@@ -149,7 +156,8 @@ export default {
         destination: this.destination,
         period: this.period,
         medium: this.medium,
-        cloud: this.cloud
+        cloud: this.cloud,
+        totalSize: this.selectedFilesSize
       }
       await this.$db.tasks.insert(task)
       this.$router.back()
@@ -168,9 +176,7 @@ export default {
       } else {
         dialogPropeties.push('openDirectory')
       }
-      const inputFiles = dialog.showOpenDialog({
-        properties: dialogPropeties
-      })
+      const inputFiles = dialog.showOpenDialog({ properties: dialogPropeties })
 
       for (const f of inputFiles) {
         if (this.files.map(f => f.name).includes(f)) { continue }
@@ -191,6 +197,15 @@ export default {
         }
 
         this.files.push(file)
+      }
+
+      for (const f of this.files) {
+        if (f.isDir) {
+          getSize(f.name, (err, size) => {
+            if (err) throw err
+            f.stats.size = size
+          })
+        }
       }
     },
     clearSelection () {
