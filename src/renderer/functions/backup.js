@@ -16,7 +16,7 @@ export default {
         this.prepareFull(task, point)
         break
       case algorithms.incremental:
-        this.prepareIncremental(task, point)
+        await this.prepareIncremental(task, point)
         break
       case algorithms.differential:
         await this.prepareDifferential(task, point)
@@ -36,8 +36,32 @@ export default {
   prepareFull (task, point) {
     point.files = task.files
   },
-  prepareIncremental (task, point) {
-    // TODO impl.
+  async prepareIncremental (task, point) {
+    const points = await db.points.find({ taskId: task._id })
+    point.previous = points.length ? points.find(p => p.latest)._id : null
+
+    console.log(point.previous)
+    let pointFiles = []
+    if (point.previous) { // Инкрементная копия
+      const previousPoint = await db.points.findOne({ _id: point.previous })
+
+      for (const file of previousPoint.files) {
+        const attrs = fs.lstatSync(file.name)
+        const hash = getFileHash(file.name, attrs)
+        pointFiles.push({ name: file.name, attrs, hash })
+      }
+
+      pointFiles = this.removeUnchangedFiles(pointFiles, previousPoint.files)
+      await db.points.update({ _id: point.previous }, { latest: false })
+    } else { // Полная копия в инкрементной
+      for (const file of task.files.map(f => f.name)) {
+        const attrs = fs.lstatSync(file)
+        const hash = getFileHash(file, attrs)
+        pointFiles.push({ name: file, attrs, hash })
+      }
+    }
+    point.files = pointFiles
+    point.latest = true
   },
   async prepareDifferential (task, point) {
     // Если есть точка восстановления, у которой нет предыдущей, то это связанная с полной копией.
