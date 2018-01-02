@@ -7,8 +7,8 @@
         <label>Название точки восстановления</label>
         <input class="form-control" v-model="pointName" type="text" maxlength="100">
       </div>
-      <button class="btn btn-primary" @click="backup">Запустить</button>
       <button class="btn btn-danger" @click="$router.back()">Отмена</button>
+      <button class="btn btn-primary" @click="backup">Запустить</button>
     </div>
   </div>
 </div>
