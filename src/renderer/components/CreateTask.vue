@@ -8,7 +8,7 @@
   </header>
   <div class="row">
     <div class="col-xs-6">
-      <h4 class="text-center">Настройки</h4>
+      <h4 class="text-center">Параметры задачи</h4>
       <hr/>
       <div class="form-group">
         <label>Название</label>
