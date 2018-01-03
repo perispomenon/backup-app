@@ -1,5 +1,6 @@
 'use strict'
 import tar from 'tar'
+import _ from 'lodash'
 import db from '../datastore'
 import { algorithms } from '../../enums/algorithms'
 
@@ -13,7 +14,7 @@ export default {
         copyNames = this.prepareFull(point, task)
         break
       case algorithms.incremental:
-        copyNames = this.prepareIncremental(point, task)
+        copyNames = await this.prepareIncremental(point, task)
         break
       case algorithms.differential:
         copyNames = await this.prepareDifferential(point, task)
@@ -30,9 +31,14 @@ export default {
   prepareFull (point, task) {
     return [point.filename]
   },
-  prepareIncremental (point, task) {
-    // TODO impl
-    return [point.filename]
+  async prepareIncremental (point, task) {
+    if (!point.previous) {
+      return [point.filename]
+    }
+    const taskPoints = (await db.points.find({ taskId: task._id }))
+      .filter(tp => tp.createdAt <= point.createdAt)
+
+    return _(taskPoints).sortBy('createdAt').value().map(tp => tp.filename)
   },
   async prepareDifferential (point, task) {
     if (!point.previous) {
