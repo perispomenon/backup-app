@@ -26,7 +26,7 @@ export default {
     const changedFiles = point.files.filter(pf => pf.changed).map(pf => pf.name)
     if (!changedFiles.length) {
       console.error('Нет изменений для резервирования')
-      return
+      throw new Error('Нет изменений для резервирования')
     }
 
     console.log(point)
@@ -70,7 +70,7 @@ export default {
   },
   prepareAny (task, pointName) {
     const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
-    const filename = task.destination + '/' + task.name + '_' + pointName + '_' + timestamp + '.tgz'
+    const filename = task.destination + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
 
     return {
       taskId: task._id,

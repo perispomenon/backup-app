@@ -6904,6 +6904,10 @@ util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
 
+util-guid@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/util-guid/-/util-guid-1.0.1.tgz#379ac465585f8c54b267132aee6ca349cf3ed612"
+
 util@0.10.3, util@^0.10.3:
   version "0.10.3"
   resolved "https://registry.yarnpkg.com/util/-/util-0.10.3.tgz#7afb1afe50805246489e3db7fe0ed379336ac0f9"
@@ -6959,9 +6963,20 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
+vue-bus@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/vue-bus/-/vue-bus-1.0.0.tgz#905835820fd4cb28a1194221957bca8f8cd745bc"
+
 vue-electron@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/vue-electron/-/vue-electron-1.0.6.tgz#e798e03180b8933539defe31f92e53b9242b9406"
+
+vue-flash-message@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/vue-flash-message/-/vue-flash-message-0.2.5.tgz#695598873e1afe9801f1be57eb2c8623563bce98"
+  dependencies:
+    util-guid "^1.0.1"
+    vue "^2.5.2"
 
 vue-hot-reload-api@^2.2.0:
   version "2.2.3"
@@ -7033,6 +7048,10 @@ vue@^1.0.26:
 vue@^2.3.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.3.tgz#e1a3b1f49b6e93e574ce040b95cbc873912fecc1"
+
+vue@^2.5.2:
+  version "2.5.13"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.13.tgz#95bd31e20efcf7a7f39239c9aa6787ce8cf578e1"
 
 vuex@^2.3.1:
   version "2.5.0"

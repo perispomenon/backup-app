@@ -68,7 +68,9 @@
     "node-schedule": "^1.2.5",
     "tar": "^4.0.2",
     "vue": "^2.3.3",
+    "vue-bus": "^1.0.0",
     "vue-electron": "^1.0.6",
+    "vue-flash-message": "^0.2.5",
     "vue-router": "^2.5.3",
     "vue-strap": "^1.1.40",
     "vuex": "^2.3.1"

@@ -1,13 +1,16 @@
 <template>
   <div id="app">
     <navigation></navigation>
+    <div class="flash-wrap">
+      <flash-message></flash-message>
+    </div>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Navigation from '@/components/Navigation'
 import { ipcRenderer } from 'electron'
+import Navigation from '@/components/Navigation'
 
 export default {
   components: {
@@ -22,5 +25,10 @@ export default {
 </script>
 
 <style>
-  /* CSS */
+.flash-wrap {
+  position: fixed;
+  top: 60px;
+  right: 0px;
+  z-index: 155;
+}
 </style>
