@@ -50,7 +50,14 @@ export default {
   },
   methods: {
     async restore () {
-      await this.$store.dispatch('restore', this.selectedPoint)
+      try {
+        this.flash('Начато восстановление информации', 'info', { timeout: 3000 })
+        await this.$store.dispatch('restore', this.selectedPoint)
+        this.flash('Информация восстановлена', 'success', { timeout: 3000 })
+      } catch (error) {
+        console.error(error)
+        this.flash(error.message, 'error', { timeout: 3000 })
+      }
     }
   }
 }

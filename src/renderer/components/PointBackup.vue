@@ -35,9 +35,11 @@ export default {
       if (!this.pointName) { return }
       const task = await this.$db.tasks.findOne({ _id: this.chosenTask })
       try {
+        this.flash('Начато создание резервной копии', 'info', { timeout: 3000 })
         await this.$store.dispatch('backup', { task, pointName: this.pointName })
         this.flash('Резервная копия создана', 'success', { timeout: 3000 })
       } catch (error) {
+        console.error(error)
         this.flash(error.message, 'error', { timeout: 3000 })
       }
     }

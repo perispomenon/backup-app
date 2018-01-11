@@ -64,6 +64,7 @@
     "moment": "^2.19.1",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
+    "node-dir": "^0.1.17",
     "node-notifier": "^5.1.2",
     "node-schedule": "^1.2.5",
     "tar": "^4.0.2",

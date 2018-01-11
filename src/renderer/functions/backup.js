@@ -2,6 +2,7 @@
 const tar = require('tar')
 const moment = require('moment')
 const fs = require('fs-extra')
+const dir = require('node-dir')
 const db = require('../datastore').default
 const { algorithms } = require('../../enums/algorithms')
 const { getFileHash } = require('../functions/helpers').default
@@ -13,7 +14,7 @@ export default {
 
     switch (Number(task.algorithm)) {
       case algorithms.full:
-        this.prepareFull(task, point)
+        await this.prepareFull(task, point)
         break
       case algorithms.incremental:
         await this.prepareIncremental(task, point)
@@ -32,10 +33,9 @@ export default {
     console.log(point)
     await tar.c({ file: point.filename, gzip: true }, changedFiles)
     await db.points.insert(point)
-    console.log('created backup ' + point.filename)
   },
-  prepareFull (task, point) {
-    point.files = this.mapFiles(task)
+  async prepareFull (task, point) {
+    point.files = await this.mapFiles(task)
   },
   async prepareIncremental (task, point) {
     const points = await db.points.find({ taskId: task._id })
@@ -44,12 +44,13 @@ export default {
     let pointFiles = []
     if (point.previous) { // Инкрементная копия
       const previousPoint = await db.points.findOne({ _id: point.previous })
-      pointFiles = this.removeUnchangedFiles(this.mapFiles(task), previousPoint.files)
+      const currentFiles = await this.mapFiles(task)
+      pointFiles = this.removeUnchangedFiles(currentFiles, previousPoint.files)
       if (pointFiles.filter(pf => pf.changed).length) {
         await db.points.update({ _id: point.previous }, { $set: { latest: false } })
       }
     } else { // Полная копия в инкрементной
-      pointFiles = this.mapFiles(task)
+      pointFiles = await this.mapFiles(task)
     }
     point.files = pointFiles
     point.latest = true
@@ -62,9 +63,10 @@ export default {
     let pointFiles = []
     if (point.previous) { // Дифференциальная копия.
       const previousPoint = await db.points.findOne({ _id: point.previous })
-      pointFiles = this.removeUnchangedFiles(this.mapFiles(task), previousPoint.files)
+      const currentFiles = await this.mapFiles(task)
+      pointFiles = this.removeUnchangedFiles(currentFiles, previousPoint.files)
     } else { // Полная копия в дифференциальной.
-      pointFiles = this.mapFiles(task)
+      pointFiles = await this.mapFiles(task)
     }
     point.files = pointFiles
   },
@@ -86,13 +88,21 @@ export default {
     }
     return currentFiles
   },
-  mapFiles (task) {
+  async mapFiles (task) {
     const pointFiles = []
-    for (const file of task.files.map(f => f.name)) {
+    let allFiles = []
+    for (const file of task.files.filter(f => f.isDir).map(f => f.name)) {
+      const temp = await dir.promiseFiles(file)
+      allFiles = allFiles.concat(temp)
+    }
+
+    allFiles = allFiles.concat(task.files.filter(f => f.isFile).map(f => f.name))
+    for (const file of allFiles) {
       const attrs = fs.lstatSync(file)
       const hash = getFileHash(file, attrs)
-      pointFiles.push({ name: file, attrs, hash, changed: true })
+      pointFiles.push({ name: file, hash, changed: true })
     }
+
     return pointFiles
   }
 }
