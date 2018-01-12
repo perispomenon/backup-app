@@ -1,6 +1,8 @@
 'use strict'
 
 import crypto from 'crypto'
+import fs from 'fs'
+import config from '../../config'
 
 export default {
   generateSalt () {
@@ -17,6 +19,15 @@ export default {
         if (err) reject(err)
         else resolve(key)
       })
+    })
+  },
+  do (archive, filename, key, iv) {
+    return new Promise((resolve, reject) => {
+      const cipher = crypto.createCipheriv(config.encryptionAlgorithm, key, iv)
+      const output = fs.createWriteStream(filename)
+      output.on('finish', () => { resolve() })
+      output.on('error', err => { reject(err) })
+      archive.pipe(cipher).pipe(output)
     })
   }
 }

@@ -3,7 +3,6 @@ const tar = require('tar')
 const moment = require('moment')
 const fs = require('fs-extra')
 const dir = require('node-dir')
-const crypto = require('crypto')
 const path = require('path')
 const db = require('../datastore').default
 const config = require('../../config').default
@@ -41,16 +40,14 @@ export default {
       const key = await encryption.deriveKey(config.keyPassword, keySalt, 111333, 32, 'sha512')
 
       const archive = await tar.c({ gzip: true }, changedFiles)
-      const cipher = crypto.createCipheriv(config.encryptionAlgorithm, key, iv)
-      const output = fs.createWriteStream(point.filename + '.enc')
-      archive.pipe(cipher).pipe(output)
-
+      await encryption.do(archive, point.filename + '.enc', key, iv)
       await fs.writeFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)), key)
       point.ivSalt = ivSalt
     } else {
       await tar.c({ file: point.filename, gzip: true }, changedFiles)
     }
     await db.points.insert(point)
+    console.log('created backup')
   },
   async prepareFull (task, point) {
     point.files = await this.mapFiles(task)
