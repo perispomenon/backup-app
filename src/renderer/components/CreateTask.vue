@@ -59,6 +59,21 @@
           </select>
         </div>
       </div>
+      <div class="form-group cbx">
+        <input type="checkbox" v-model="isEncrypted">
+        <label>Шифровать резервные копии 
+          <span class="glyphicon glyphicon-info-sign"></span>
+        </label>
+      </div>
+      <div class="form-group" v-if="isEncrypted">
+        <label>Выбор устройства для хранения ключа шифрования</label>
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" @click="chooseKeyStorage">Выбрать</button>
+            </span>
+            <input type="text" class="form-control" disabled v-model="keyStorage">
+        </div>
+      </div>
       <button @click="$router.back()" class="btn btn-danger">Назад</button>
       <button @click="create" class="btn btn-primary pull-right">Создать задачу</button>
     </div>
@@ -75,7 +90,7 @@
         </div>
         <div class="panel-body">
           <div v-for="file in files" :key="file.name">
-            <span :class="`glyphicon glyphicon-${file.isFile ? 'file' : 'folder-close'}`"></span>
+            <span :class="`glyphicon glyphicon-${file.isFile ? 'file' : 'folder-open'}`"></span>
             {{file.name}}
           </div>
         </div>
@@ -119,7 +134,9 @@ export default {
       cloud: 1,
       files: [],
       destination: null,
-      cron: null
+      cron: null,
+      isEncrypted: false,
+      keyStorage: null
     }
   },
   computed: {
@@ -151,13 +168,16 @@ export default {
         name: this.name,
         files: this.files,
         algorithm: this.algorithm,
+        // TODO убрать тестовые 30 секунд.
         datetime: moment().add(30, 'second').format(),
         cron: this.period === '4' ? this.cron : getCron(this.period),
         destination: this.destination,
         period: this.period,
         medium: this.medium,
         cloud: this.cloud,
-        totalSize: this.selectedFilesSize
+        totalSize: this.selectedFilesSize,
+        isEncrypted: this.isEncrypted,
+        keyStorage: this.keyStorage
       }
       await this.$db.tasks.insert(task)
       this.$router.back()
@@ -181,6 +201,7 @@ export default {
       for (const f of inputFiles) {
         if (this.files.map(f => f.name).includes(f)) { continue }
 
+        // TODO убрать ненужные поля
         const fStats = fs.lstatSync(f)
         const texty = f + fStats.size + fStats.mtime
         const hash = hasha(texty, { algorithm: 'md5' })
@@ -210,16 +231,23 @@ export default {
     },
     clearSelection () {
       this.files = []
+    },
+    chooseKeyStorage () {
+      this.keyStorage = dialog.showOpenDialog({ properties: ['openDirectory'] })[0]
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .choice-items {
   padding-right: 15px;
 }
 .choice-items:first-child {
   padding-right: 0;
+}
+input[type="checkbox"] {
+  vertical-align: middle;
+  margin-top: 0;
 }
 </style>

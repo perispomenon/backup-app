@@ -3,9 +3,13 @@ const tar = require('tar')
 const moment = require('moment')
 const fs = require('fs-extra')
 const dir = require('node-dir')
+const crypto = require('crypto')
+const path = require('path')
 const db = require('../datastore').default
+const config = require('../../config').default
+const encryption = require('../functions/encryption').default
 const { algorithms } = require('../../enums/algorithms')
-const { getFileHash } = require('../functions/helpers').default
+const { getFileHash, getKeyFilename } = require('../functions/helpers')
 
 export default {
   async do (params) {
@@ -26,12 +30,26 @@ export default {
 
     const changedFiles = point.files.filter(pf => pf.changed).map(pf => pf.name)
     if (!changedFiles.length) {
-      console.error('Нет изменений для резервирования')
       throw new Error('Нет изменений для резервирования')
     }
 
     console.log(point)
-    await tar.c({ file: point.filename, gzip: true }, changedFiles)
+    if (task.isEncrypted) {
+      const ivSalt = await encryption.generateSalt()
+      const iv = await encryption.deriveKey(config.ivPassword, ivSalt, 111333, 16, 'sha512')
+      const keySalt = await encryption.generateSalt()
+      const key = await encryption.deriveKey(config.keyPassword, keySalt, 111333, 32, 'sha512')
+
+      const archive = await tar.c({ gzip: true }, changedFiles)
+      const cipher = crypto.createCipheriv(config.encryptionAlgorithm, key, iv)
+      const output = fs.createWriteStream(point.filename + '.enc')
+      archive.pipe(cipher).pipe(output)
+
+      await fs.writeFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)), key)
+      point.ivSalt = ivSalt
+    } else {
+      await tar.c({ file: point.filename, gzip: true }, changedFiles)
+    }
     await db.points.insert(point)
   },
   async prepareFull (task, point) {

@@ -20,6 +20,12 @@
       Последняя точка восстановления: <span class="lighter"></span>
     </label>
     <label>
+      Шифрование включено: <span class="lighter">{{ isEncryptionOn }}</span>
+    </label>
+    <label>
+      Место хранения ключа: <span class="lighter">{{ task.keyStorage }}</span>
+    </label>
+    <label>
       Носитель: <span class="lighter">{{ mediumName }}</span>
     </label>
     <label>
@@ -36,7 +42,10 @@
     </label>
     <label>Список файлов и директорий:</label>
     <ul class="list-group">
-      <li class="list-group-item" v-for="file in task.files" :key="file.name">{{ file.name }}</li>
+      <li class="list-group-item" v-for="file in task.files" :key="file.name">
+        <span :class="`glyphicon glyphicon-${file.isFile ? 'file' : 'folder-open'}`"></span>
+        {{ file.name }}
+      </li>
     </ul>
     <div class="form-group">
       <label>Комментарий</label>
@@ -73,6 +82,10 @@ export default {
     },
     mediumName () {
       return getMediumName(this.task.medium)
+    },
+    isEncryptionOn () {
+      if (!this.chosenTask) return null
+      else return this.task.isEncrypted ? 'Да' : 'Нет'
     }
   },
   async mounted () {

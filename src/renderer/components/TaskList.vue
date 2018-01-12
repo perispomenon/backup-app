@@ -11,11 +11,11 @@
     </thead>
     <tbody>
       <tr v-for="task in tasks" :key="task._id">
-        <td>
+        <td style="vertical-align: middle">
           <input type="checkbox" :value="task._id" name="task" @change="deselect" @click="chooseTask(task._id)">
         </td>
-        <td>{{ task.name }}</td>
-        <td>{{ new Date(task.datetime).toLocaleString('ru') }}</td>
+        <td style="vertical-align: middle">{{ task.name }}</td>
+        <td style="vertical-align: middle">{{ new Date(task.datetime).toLocaleString('ru') }}</td>
       </tr>
     </tbody>
   </table>
@@ -63,8 +63,4 @@ export default {
 </script>
 
 <style>
-input[type="checkbox"] {
-  width: 17px;
-  height: 17px;
-}
 </style>
