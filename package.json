@@ -68,6 +68,7 @@
     "node-notifier": "^5.1.2",
     "node-schedule": "^1.2.5",
     "tar": "^4.0.2",
+    "validator": "^9.2.0",
     "vue": "^2.3.3",
     "vue-bus": "^1.0.0",
     "vue-electron": "^1.0.6",

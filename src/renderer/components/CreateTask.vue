@@ -61,7 +61,7 @@
       </div>
       <div class="form-group cbx">
         <input type="checkbox" v-model="isEncrypted">
-        <label>Шифровать резервные копии 
+        <label>Шифровать резервные копии
           <span class="glyphicon glyphicon-info-sign"></span>
         </label>
       </div>
@@ -109,19 +109,14 @@ const { dialog } = require('electron').remote
 const moment = require('moment')
 const hasha = require('hasha')
 const getSize = require('get-folder-size')
+const cronParser = require('cron-parser')
+const isEmpty = require('lodash/isEmpty')
 
 const { periods, getCron } = require('../../enums/periods.js')
 const { algorithms } = require('../../enums/algorithms.js')
+const { mediums } = require('../../enums/mediums.js')
 
 moment.locale('ru')
-
-const required = [
-  'algorithm',
-  'period',
-  'medium',
-  'name',
-  'destination'
-]
 
 export default {
   props: ['isReadOnly'],
@@ -140,9 +135,6 @@ export default {
     }
   },
   computed: {
-    isValid () {
-      return required.every(r => this[r])
-    },
     datetime () {
       switch (Number(this.period)) {
         case periods.everyDay:
@@ -162,25 +154,30 @@ export default {
   },
   methods: {
     async create () {
-      if (!this.isValid || !this.files.length) return
+      try {
+        this.validate()
 
-      const task = {
-        name: this.name,
-        files: this.files,
-        algorithm: this.algorithm,
-        // TODO убрать тестовые 30 секунд.
-        datetime: moment().add(30, 'second').format(),
-        cron: this.period === '4' ? this.cron : getCron(this.period),
-        destination: this.destination,
-        period: this.period,
-        medium: this.medium,
-        cloud: this.cloud,
-        totalSize: this.selectedFilesSize,
-        isEncrypted: this.isEncrypted,
-        keyStorage: this.keyStorage
+        const task = {
+          name: this.name,
+          files: this.files,
+          algorithm: this.algorithm,
+          // TODO убрать тестовые 30 секунд.
+          datetime: moment().add(30, 'second').format(),
+          cron: this.period === '4' ? this.cron : getCron(this.period),
+          destination: this.destination,
+          period: this.period,
+          medium: this.medium,
+          cloud: this.cloud,
+          totalSize: this.selectedFilesSize,
+          isEncrypted: this.isEncrypted,
+          keyStorage: this.keyStorage
+        }
+        await this.$db.tasks.insert(task)
+        this.$router.back()
+      } catch (error) {
+        console.error(error)
+        this.flash(error.message, 'error', { timeout: 5000 })
       }
-      await this.$db.tasks.insert(task)
-      this.$router.back()
     },
     chooseDestination () {
       const destination = dialog.showOpenDialog({
@@ -234,6 +231,28 @@ export default {
     },
     chooseKeyStorage () {
       this.keyStorage = dialog.showOpenDialog({ properties: ['openDirectory'] })[0]
+    },
+    validate () {
+      if (!this.name) { throw new Error('Введите название задачи') }
+
+      if (Number(this.period) === periods.manually) {
+        if (!this.cron) { throw new Error('Введите cron периодичности задачи') }
+        const cronValidation = cronParser.parseString(this.cron)
+        if (!isEmpty(cronValidation.errors)) { throw new Error('Введите cron в правильном формате') }
+      }
+
+      if (Number(this.medium) === mediums.local) {
+        if (!this.destination) { throw new Error('Выберите место хранения резервных копий') }
+      }
+
+      if (this.isEncrypted) {
+        if (!this.keyStorage) { throw new Error('Выберите место хранения ключа шифрования') }
+        if (!this.keyStorage.includes('/media/')) {
+          throw new Error('Местом хранения ключа шифрования не может быть локальный диск')
+        }
+      }
+
+      if (!this.files.length) { throw new Error('Не выбраны файлы для резервирования') }
     }
   }
 }
