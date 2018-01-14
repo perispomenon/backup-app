@@ -7018,6 +7018,10 @@ vue-router@^2.5.3:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-2.8.1.tgz#9833c9ee57ac83beb0269056fefee71713f20695"
 
+vue-simple-progress@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/vue-simple-progress/-/vue-simple-progress-1.0.2.tgz#4e0cb941035627def41beac28c530687c59d559c"
+
 vue-strap@^1.1.40:
   version "1.1.40"
   resolved "https://registry.yarnpkg.com/vue-strap/-/vue-strap-1.1.40.tgz#091183cfaea9e456e8a7a092b9dc697a8c184302"

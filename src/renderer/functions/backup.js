@@ -1,6 +1,5 @@
 'use strict'
 const tar = require('tar')
-const moment = require('moment')
 const fs = require('fs-extra')
 const dir = require('node-dir')
 const path = require('path')
@@ -13,7 +12,7 @@ const { getFileHash, getKeyFilename } = require('../functions/helpers')
 export default {
   async do (params) {
     const task = params.task
-    const point = this.prepareAny(task, params.pointName)
+    const point = this.prepareAny(params)
 
     switch (Number(task.algorithm)) {
       case algorithms.full:
@@ -85,14 +84,11 @@ export default {
     }
     point.files = pointFiles
   },
-  prepareAny (task, pointName) {
-    const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
-    const filename = task.destination + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
-
+  prepareAny (params) {
     return {
-      taskId: task._id,
-      name: pointName,
-      filename: filename
+      taskId: params.task._id,
+      name: params.pointName,
+      filename: params.filename
     }
   },
   removeUnchangedFiles (currentFiles, previousFiles) {

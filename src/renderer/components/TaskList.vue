@@ -6,7 +6,7 @@
       <tr>
         <th></th>
         <th>Название</th>
-        <th>Дата следующего копирования</th>
+        <th>Следующее копирование</th>
       </tr>
     </thead>
     <tbody>
@@ -62,5 +62,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+table td:nth-child(2) {
+  width: 100px;
+}
 </style>

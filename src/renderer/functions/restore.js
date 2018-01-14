@@ -27,7 +27,7 @@ export default {
         break
     }
 
-    await this.execute(copyNames, task, point)
+    await this.execute(copyNames, task)
   },
   async getRestoreData (pointId) {
     const point = await db.points.findOne({ _id: pointId })
@@ -56,6 +56,8 @@ export default {
   async execute (copyNames, task, point) {
     for (const copyName of copyNames) {
       if (task.isEncrypted) {
+        const points = await db.points.find({})
+        const point = points.find(p => p.taskId === task._id && p.filename === copyName)
         await this.decrypt(copyName, task, point)
       } else {
         await tar.x({ file: copyName, cwd: '/' })

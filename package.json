@@ -74,6 +74,7 @@
     "vue-electron": "^1.0.6",
     "vue-flash-message": "^0.2.5",
     "vue-router": "^2.5.3",
+    "vue-simple-progress": "^1.0.2",
     "vue-strap": "^1.1.40",
     "vuex": "^2.3.1"
   },

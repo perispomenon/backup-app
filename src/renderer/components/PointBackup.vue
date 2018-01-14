@@ -16,6 +16,8 @@
 
 <script>
 import { mapState } from 'vuex'
+import fs from 'fs-extra'
+import moment from 'moment'
 
 export default {
   data () {
@@ -34,14 +36,37 @@ export default {
     async backup () {
       if (!this.pointName) { return }
       const task = await this.$db.tasks.findOne({ _id: this.chosenTask })
+      let percentsTimer
+
       try {
         this.flash('Начато создание резервной копии', 'info', { timeout: 3000 })
-        await this.$store.dispatch('backup', { task, pointName: this.pointName })
+        console.time('backup-operation')
+        const filename = this.generateFilename(task, this.pointName)
+        percentsTimer = setInterval(async () => {
+          let sizeDesc
+          task.isEncrypted ? sizeDesc = filename + '.enc' : sizeDesc = filename
+
+          if (fs.existsSync(sizeDesc)) {
+            const size = fs.lstatSync(sizeDesc).size / 1024 / 1024
+            console.log(size / task.totalSize * 100)
+            console.log(size, task.totalSize)
+          }
+        }, 300)
+
+        await this.$store.dispatch('backup', { task, filename, pointName: this.pointName })
+        console.timeEnd('backup-operation')
         this.flash('Резервная копия создана', 'success', { timeout: 3000 })
       } catch (error) {
         console.error(error)
         this.flash(error.message, 'error', { timeout: 3000 })
+      } finally {
+        clearInterval(percentsTimer)
       }
+    },
+    generateFilename (task, pointName) {
+      const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
+      const filename = task.destination + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
+      return filename
     }
   }
 }

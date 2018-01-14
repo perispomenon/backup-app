@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div class="container">
+  <div class="container-fluid">
     <div class="row">
       <div class="col-xs-6">
         <task-list></task-list>
