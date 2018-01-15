@@ -4,7 +4,8 @@ import restore from '../../functions/restore'
 
 const state = {
   all: [],
-  chosen: null
+  chosen: null,
+  running: { id: null, now: 0 }
 }
 
 const mutations = {
@@ -13,6 +14,13 @@ const mutations = {
   },
   TASK_CHOOSE (state, id) {
     state.chosen = id
+  },
+  TASK_RUN (state, id) {
+    state.running.id = id
+  },
+  RUNNING_TASK_SET (state, value) {
+    if (value >= 100) { return }
+    state.running.now = value
   }
 }
 

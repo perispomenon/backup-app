@@ -38,12 +38,12 @@ export default {
       const keySalt = await encryption.generateSalt()
       const key = await encryption.deriveKey(config.keyPassword, keySalt, 111333, 32, 'sha512')
 
-      const archive = await tar.c({ gzip: true }, changedFiles)
+      const archive = await tar.c({ gzip: task.isCompressed }, changedFiles)
       await encryption.do(archive, point.filename + '.enc', key, iv)
       await fs.writeFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)), key)
       point.ivSalt = ivSalt
     } else {
-      await tar.c({ file: point.filename, gzip: true }, changedFiles)
+      await tar.c({ file: point.filename, gzip: task.isCompressed }, changedFiles)
     }
     await db.points.insert(point)
     console.log('created backup')

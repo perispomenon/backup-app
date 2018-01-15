@@ -39,6 +39,7 @@ export default {
       let percentsTimer
 
       try {
+        this.$store.commit('TASK_RUN', task._id)
         this.flash('Начато создание резервной копии', 'info', { timeout: 3000 })
         console.time('backup-operation')
         const filename = this.generateFilename(task, this.pointName)
@@ -47,9 +48,10 @@ export default {
           task.isEncrypted ? sizeDesc = filename + '.enc' : sizeDesc = filename
 
           if (fs.existsSync(sizeDesc)) {
-            const size = fs.lstatSync(sizeDesc).size / 1024 / 1024
-            console.log(size / task.totalSize * 100)
-            console.log(size, task.totalSize)
+            const size = fs.statSync(sizeDesc).size / 1024 / 1024
+            const multiplier = task.isCompressed ? 109 : 100
+            this.$store.commit('RUNNING_TASK_SET',
+              Math.round(size / task.totalSize * multiplier))
           }
         }, 300)
 
@@ -61,6 +63,7 @@ export default {
         this.flash(error.message, 'error', { timeout: 3000 })
       } finally {
         clearInterval(percentsTimer)
+        this.$store.commit('TASK_RUN', null)
       }
     },
     generateFilename (task, pointName) {

@@ -60,6 +60,12 @@
         </div>
       </div>
       <div class="form-group cbx">
+        <input type="checkbox" v-model="isCompressed">
+        <label>Сжимать резервные копии
+          <span class="glyphicon glyphicon-info-sign"></span>
+        </label>
+      </div>
+      <div class="form-group cbx">
         <input type="checkbox" v-model="isEncrypted">
         <label>Шифровать резервные копии
           <span class="glyphicon glyphicon-info-sign"></span>
@@ -131,7 +137,8 @@ export default {
       destination: null,
       cron: null,
       isEncrypted: false,
-      keyStorage: null
+      keyStorage: null,
+      isCompressed: false
     }
   },
   computed: {
@@ -170,7 +177,8 @@ export default {
           cloud: this.cloud,
           totalSize: this.selectedFilesSize,
           isEncrypted: this.isEncrypted,
-          keyStorage: this.keyStorage
+          keyStorage: this.keyStorage,
+          isCompressed: this.isCompressed
         }
         await this.$db.tasks.insert(task)
         this.$router.back()

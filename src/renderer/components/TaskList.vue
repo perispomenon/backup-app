@@ -1,12 +1,13 @@
 <template>
 <div class="table-responsive">
-  <table class="table table-striped">
+  <table class="table">
     <caption class="text-center">Настроенные задачи резервного копирования</caption>
     <thead>
       <tr>
         <th></th>
         <th>Название</th>
         <th>Следующее копирование</th>
+        <th>Статус</th>
       </tr>
     </thead>
     <tbody>
@@ -16,6 +17,12 @@
         </td>
         <td style="vertical-align: middle">{{ task.name }}</td>
         <td style="vertical-align: middle">{{ new Date(task.datetime).toLocaleString('ru') }}</td>
+        <td style="vertical-align: middle" class="progress-cell">
+          <div class="progress" v-if="runningTask && task._id === runningTask.id">
+            <progress-bar :now="runningTask.now" label type="primary"></progress-bar>
+          </div>
+          <template v-else>Запланирована</template>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -38,7 +45,8 @@ export default {
   computed: {
     ...mapState({
       tasks: state => state.tasks.all,
-      chosenTask: state => state.tasks.chosen
+      chosenTask: state => state.tasks.chosen,
+      runningTask: state => state.tasks.running
     })
   },
   async mounted () {
@@ -64,6 +72,15 @@ export default {
 
 <style scoped>
 table td:nth-child(2) {
-  width: 100px;
+  min-width: 100px;
+}
+table td:first-child {
+  width: 20px;
+}
+.progress {
+  margin-bottom: 0;
+}
+.progress-cell {
+  min-width: 150px;
 }
 </style>
