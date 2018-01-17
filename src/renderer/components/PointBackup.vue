@@ -4,6 +4,10 @@
     <div class="col-xs-8 col-xs-offset-2">
       <h4>Создание точки восстановления</h4>
       <div class="form-group">
+        <label>Для хранения резервной копии в облаке нужно авторизоваться</label>
+        <button class="btn btn-primary" @click="auth">Авторизация</button>
+      </div>
+      <div class="form-group">
         <label>Название точки восстановления</label>
         <input class="form-control" v-model="pointName" type="text" maxlength="100">
       </div>
@@ -18,11 +22,14 @@
 import { mapState } from 'vuex'
 import fs from 'fs-extra'
 import moment from 'moment'
+import { remote } from 'electron'
+import { mediums } from '../../enums/mediums'
 
 export default {
   data () {
     return {
-      pointName: null
+      pointName: null,
+      isCloud: false
     }
   },
   computed: {
@@ -30,7 +37,11 @@ export default {
       chosenTask: state => state.tasks.chosen
     })
   },
-  mounted () {
+  async mounted () {
+    const task = await this.$db.tasks.findOne({ _id: this.chosenTask })
+    if (Number(task.medium) === mediums.cloud) {
+      this.isCloud = true
+    }
   },
   methods: {
     async backup () {
@@ -68,8 +79,10 @@ export default {
     },
     generateFilename (task, pointName) {
       const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
-      const filename = task.destination + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
-      return filename
+      const prefix = task.destination || remote.app.getPath('userData')
+      return prefix + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
+    },
+    async auth () {
     }
   }
 }

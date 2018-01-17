@@ -3,11 +3,13 @@ const tar = require('tar')
 const fs = require('fs-extra')
 const dir = require('node-dir')
 const path = require('path')
+const axios = require('axios').default
 const db = require('../datastore').default
 const config = require('../../config').default
 const encryption = require('../functions/encryption').default
 const { algorithms } = require('../../enums/algorithms')
-const { getFileHash, getKeyFilename } = require('../functions/helpers')
+const { getFileHash, getKeyFilename, getYandexUploadUrl } = require('../functions/helpers')
+const { mediums } = require('../../enums/mediums')
 
 export default {
   async do (params) {
@@ -45,6 +47,14 @@ export default {
     } else {
       await tar.c({ file: point.filename, gzip: task.isCompressed }, changedFiles)
     }
+
+    if (Number(task.medium) === mediums.cloud) {
+      const uploadUrl = await getYandexUploadUrl(point.filename)
+      const fileContents = await fs.readFile(point.filename)
+      await axios.put(uploadUrl, fileContents)
+      await fs.remove(point.filename)
+    }
+
     await db.points.insert(point)
     console.log('created backup')
   },

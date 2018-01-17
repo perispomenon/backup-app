@@ -1,5 +1,7 @@
 'use strict'
 import hasha from 'hasha'
+import axios from 'axios'
+import config from '../../config'
 
 function getFileHash (filename, attrs) {
   const indicator = filename + attrs.size + attrs.mtime
@@ -12,4 +14,17 @@ function getKeyFilename (pointName) {
   return `${lastPart.slice(0, lastPart.length - 4)}.mky`
 }
 
-export { getFileHash, getKeyFilename }
+async function getYandexUploadUrl (fullFilename) {
+  const parts = fullFilename.split('/')
+  const filename = parts[parts.length - 1]
+  const uploadUrl = await axios.request({
+    url: `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${config.yandexAppPrefix}${filename}`,
+    method: 'get',
+    headers: {
+      Authorization: config.yandexToken
+    }
+  })
+  return uploadUrl.data.href
+}
+
+export { getFileHash, getKeyFilename, getYandexUploadUrl }
