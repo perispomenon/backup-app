@@ -1,4 +1,5 @@
 'use strict'
+
 const tar = require('tar')
 const fs = require('fs-extra')
 const dir = require('node-dir')
@@ -36,9 +37,9 @@ export default {
     console.log(point)
     if (task.isEncrypted) {
       const ivSalt = await encryption.generateSalt()
-      const iv = await encryption.deriveKey(config.ivPassword, ivSalt, 111333, 16, 'sha512')
+      const iv = await encryption.deriveKey(config.ivPassword, ivSalt, 222222, 16, 'sha512')
       const keySalt = await encryption.generateSalt()
-      const key = await encryption.deriveKey(config.keyPassword, keySalt, 111333, 32, 'sha512')
+      const key = await encryption.deriveKey(task.password, keySalt, 222222, 32, 'sha512')
 
       const archive = await tar.c({ gzip: task.isCompressed }, changedFiles)
       await encryption.do(archive, point.filename + '.enc', key, iv)

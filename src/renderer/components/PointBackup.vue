@@ -4,10 +4,6 @@
     <div class="col-xs-8 col-xs-offset-2">
       <h4>Создание точки восстановления</h4>
       <div class="form-group">
-        <label>Для хранения резервной копии в облаке нужно авторизоваться</label>
-        <button class="btn btn-primary" @click="auth">Авторизация</button>
-      </div>
-      <div class="form-group">
         <label>Название точки восстановления</label>
         <input class="form-control" v-model="pointName" type="text" maxlength="100">
       </div>
@@ -79,10 +75,8 @@ export default {
     },
     generateFilename (task, pointName) {
       const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
-      const prefix = task.destination || remote.app.getPath('userData')
+      const prefix = task.destination || remote.app.getPath('userData') + '/' + 'backup-app'
       return prefix + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
-    },
-    async auth () {
     }
   }
 }

@@ -80,6 +80,10 @@
             <input type="text" class="form-control" disabled v-model="keyStorage">
         </div>
       </div>
+      <div class="form-group" v-if="isEncrypted">
+        <label>Пароль для генерации ключа шифрования</label>
+        <input type="text" class="form-control" v-model="password">
+      </div>
       <button @click="$router.back()" class="btn btn-danger">Назад</button>
       <button @click="create" class="btn btn-primary pull-right">Создать задачу</button>
     </div>
@@ -114,6 +118,7 @@ const fs = require('fs-extra')
 const { dialog } = require('electron').remote
 const moment = require('moment')
 const hasha = require('hasha')
+const validator = require('validator')
 const getSize = require('get-folder-size')
 const cronParser = require('cron-parser')
 const isEmpty = require('lodash/isEmpty')
@@ -138,7 +143,8 @@ export default {
       cron: null,
       isEncrypted: false,
       keyStorage: null,
-      isCompressed: false
+      isCompressed: false,
+      password: null
     }
   },
   computed: {
@@ -180,6 +186,9 @@ export default {
           keyStorage: this.keyStorage,
           isCompressed: this.isCompressed
         }
+        if (task.isEncrypted) {
+          task.password = await hasha(this.password)
+        }
         await this.$db.tasks.insert(task)
         this.$router.back()
       } catch (error) {
@@ -206,7 +215,6 @@ export default {
       for (const f of inputFiles) {
         if (this.files.map(f => f.name).includes(f)) { continue }
 
-        // TODO убрать ненужные поля
         const fStats = fs.lstatSync(f)
         const texty = f + fStats.size + fStats.mtime
         const hash = hasha(texty, { algorithm: 'md5' })
@@ -257,6 +265,12 @@ export default {
         if (!this.keyStorage) { throw new Error('Выберите место хранения ключа шифрования') }
         if (!this.keyStorage.includes('/media/')) {
           throw new Error('Местом хранения ключа шифрования не может быть локальный диск')
+        }
+        if (!this.password || this.password.length < 10) {
+          throw new Error('Пароль должен быть не короче 10 символов')
+        }
+        if (!validator.isAlphanumeric(this.password)) {
+          throw new Error('Пароль должен содержать только русские и латинские буквы и цифры')
         }
       }
 
