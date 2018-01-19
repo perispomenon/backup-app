@@ -9,8 +9,11 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
 import Navigation from '@/components/Navigation'
+import schedule from 'node-schedule'
+import notifier from 'node-notifier'
+import backup from './functions/backup'
+import { generateFilename } from './functions/helpers'
 
 export default {
   components: {
@@ -18,8 +21,21 @@ export default {
   },
   name: 'backup-app',
   async mounted () {
-    const tasks = await this.$db.tasks.find({})
-    ipcRenderer.send('scheduleJobs', tasks)
+    await this.schedule()
+  },
+  methods: {
+    async schedule () {
+      const tasks = await this.$db.tasks.find({})
+      for (const task of tasks) {
+        schedule.scheduleJob(task.datetime, async () => {
+          notifier.notify({
+            title: 'Программа резервного копирования',
+            message: 'Сейчас будет произведено запланированное резервное копирование по задаче ' + task.name
+          })
+          await backup.do({ task, filename: generateFilename(task, 'crap'), pointName: 'crap' })
+        })
+      }
+    }
   }
 }
 </script>

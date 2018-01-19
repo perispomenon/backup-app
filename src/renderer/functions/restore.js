@@ -79,7 +79,7 @@ export default {
   async decrypt (copyName, task, point) {
     return new Promise(async (resolve, reject) => {
       const key = await fs.readFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)))
-      const iv = await encryption.deriveKey(config.ivPassword, point.ivSalt, 111333, 16, 'sha512')
+      const iv = await encryption.deriveKey(config.ivPassword, point.ivSalt, config.iterations, 16, 'sha512')
       const input = fs.createReadStream(copyName + '.enc')
       const decipher = crypto.createDecipheriv(config.encryptionAlgorithm, key, iv)
       const output = await tar.x({ cwd: '/' })

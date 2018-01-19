@@ -1,6 +1,8 @@
 'use strict'
 import hasha from 'hasha'
 import axios from 'axios'
+import moment from 'moment'
+import { remote } from 'electron'
 import config from '../../config'
 
 function getFileHash (filename, attrs) {
@@ -41,4 +43,10 @@ async function getYandexDownloadUrl (fullFilename) {
   return downloadUrl.data.href
 }
 
-export { getFileHash, getKeyFilename, getYandexUploadUrl, getYandexDownloadUrl }
+function generateFilename (task, pointName) {
+  const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
+  const prefix = task.destination || remote.app.getPath('userData') + '/' + 'backup-app'
+  return prefix + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
+}
+
+export { getFileHash, getKeyFilename, getYandexUploadUrl, getYandexDownloadUrl, generateFilename }

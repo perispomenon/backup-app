@@ -17,9 +17,8 @@
 <script>
 import { mapState } from 'vuex'
 import fs from 'fs-extra'
-import moment from 'moment'
-import { remote } from 'electron'
 import { mediums } from '../../enums/mediums'
+import { generateFilename } from '../functions/helpers'
 
 export default {
   data () {
@@ -49,7 +48,7 @@ export default {
         this.$store.commit('TASK_RUN', task._id)
         this.flash('Начато создание резервной копии', 'info', { timeout: 3000 })
         console.time('backup-operation')
-        const filename = this.generateFilename(task, this.pointName)
+        const filename = generateFilename(task, this.pointName)
         percentsTimer = setInterval(async () => {
           let sizeDesc
           task.isEncrypted ? sizeDesc = filename + '.enc' : sizeDesc = filename
@@ -72,11 +71,6 @@ export default {
         clearInterval(percentsTimer)
         this.$store.commit('TASK_RUN', null)
       }
-    },
-    generateFilename (task, pointName) {
-      const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss')
-      const prefix = task.destination || remote.app.getPath('userData') + '/' + 'backup-app'
-      return prefix + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
     }
   }
 }
