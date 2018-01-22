@@ -4,7 +4,9 @@
     <div class="container">
       <ul class="nav navbar-nav">
         <li>
-          <router-link :to="{ name: 'create-task' }" title="Создать задачу"><span class="glyphicon glyphicon-plus"></span></router-link>
+          <router-link :to="{ name: 'create-task' }" title="Создать задачу">
+            <span class="glyphicon glyphicon-plus"></span>
+          </router-link>
         </li>
         <li>
           <a title="Редактировать задачу">
@@ -29,7 +31,9 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-          <a @click="$router.push('settings')" title="Настройки"><span class="glyphicon glyphicon-cog"></span></a>
+          <router-link :to="{ name: 'settings' }" title="Настройки">
+            <span class="glyphicon glyphicon-cog"></span>
+          </router-link>
         </li>
         <li>
           <router-link :to="{ name: 'landing-page' }" title="На главный экран">

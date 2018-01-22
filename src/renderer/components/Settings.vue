@@ -3,32 +3,44 @@
   <h3 class="text-center">Настройки приложения</h3>
   <div class="row">
     <div class="col-xs-8 col-xs-offset-2">
-      <div class="form-group"><label>Количество хранимых точек восстановления</label><input type="number" min="1" step="1" class="form-control"></div>
-      <div class="form-group"><label>Фильтр (файлы и директории, подходящие под этот фильтр никогда не будут копироваться)</label><input type="text" class="form-control"></div>
-      <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
-      <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
-      <div class="form-group"><label>text</label><input type="text" class="form-control"></div>
+      <div class="form-group">
+        <label>Фильтр (файлы и директории, подходящие под этот фильтр никогда не будут копироваться)
+        </label>
+        <input type="text" class="form-control" v-model="filter">
+      </div>
       <button class="btn btn-danger" @click="$router.back()">Отмена</button>
       <button class="btn btn-primary pull-right" @click="save">Сохранить</button>
     </div>
   </div>
-  
 </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   data () {
-    return {}
+    return {
+      filter: null
+    }
+  },
+  computed: {
+    ...mapState({
+      settings: state => state.config.settings
+    })
+  },
+  async mounted () {
+    await this.$store.dispatch('getSettings')
+    this.filter = this.settings.filter
   },
   methods: {
-    save () {
-      console.log('saving settings')
+    async save () {
+      const newSettings = {
+        filter: this.filter
+      }
+      await this.$store.dispatch('saveSettings', newSettings)
+      this.flash('Настройки сохранены', 'success', { timeout: 3000 })
     }
   }
 }
 </script>
-
-<style>
-
-</style>

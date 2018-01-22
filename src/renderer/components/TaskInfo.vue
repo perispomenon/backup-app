@@ -16,14 +16,20 @@
     <label v-show="task.period == 4">
       Период: <span class="lighter">{{ task.cron }}</span>
     </label>
-    <label>
-      Последняя точка восстановления: <span class="lighter"></span>
+    <label v-if="latestPoint">
+      Последняя точка восстановления: <span class="lighter">{{ latestPoint.name }}</span>
+    </label>
+    <label v-if="latestPoint">
+      Последнее резервное копирование: <span class="lighter">{{ new Date(latestPoint.createdAt).toLocaleString() }}</span>
     </label>
     <label>
       Шифрование включено: <span class="lighter">{{ isEncryptionOn }}</span>
     </label>
     <label>
       Место хранения ключа: <span class="lighter">{{ task.keyStorage }}</span>
+    </label>
+    <label>
+      Сжатие включено: <span class="lighter">{{ isCompressionOn }}</span>
     </label>
     <label>
       Носитель: <span class="lighter">{{ mediumName }}</span>
@@ -57,6 +63,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import moment from 'moment'
 import algorithms from '../../enums/algorithms.js'
 import periods from '../../enums/periods.js'
 import { getMediumName } from '../../enums/mediums.js'
@@ -65,10 +72,18 @@ export default {
   data () {
     return {}
   },
+  watch: {
+    async task () {
+      if (this.task) {
+        await this.$store.dispatch('getTaskPoints', this.task._id)
+      }
+    }
+  },
   computed: {
     ...mapState({
       tasks: state => state.tasks.all,
-      chosenTask: state => state.tasks.chosen
+      chosenTask: state => state.tasks.chosen,
+      points: state => state.points.taskPoints
     }),
     task () {
       if (!this.chosenTask) return null
@@ -86,9 +101,20 @@ export default {
     isEncryptionOn () {
       if (!this.chosenTask) return null
       else return this.task.isEncrypted ? 'Да' : 'Нет'
+    },
+    isCompressionOn () {
+      if (!this.chosenTask) return null
+      else return this.task.isCompressed ? 'Да' : 'Нет'
+    },
+    latestPoint () {
+      if (!this.chosenTask) return null
+      else {
+        const createdAts = this.points.map(p => moment(p.createdAt))
+        const latestCreatedAt = moment.max(createdAts)
+        const index = createdAts.indexOf(latestCreatedAt)
+        return this.points[index]
+      }
     }
-  },
-  async mounted () {
   }
 }
 </script>

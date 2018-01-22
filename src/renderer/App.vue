@@ -27,12 +27,18 @@ export default {
     async schedule () {
       const tasks = await this.$db.tasks.find({})
       for (const task of tasks) {
-        schedule.scheduleJob(task.datetime, async () => {
+        schedule.scheduleJob(task.cron, async () => {
           notifier.notify({
             title: 'Программа резервного копирования',
             message: 'Сейчас будет произведено запланированное резервное копирование по задаче ' + task.name
           })
-          await backup.do({ task, filename: generateFilename(task, 'crap'), pointName: 'crap' })
+          try {
+            const pointName = 'auto-point'
+            await backup.do({ task, filename: generateFilename(task, pointName), pointName })
+          } catch (error) {
+            console.error(error)
+            this.flash(error.message, { timeout: 3000 })
+          }
         })
       }
     }

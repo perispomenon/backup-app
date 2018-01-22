@@ -55,7 +55,7 @@
         <div v-if="medium == 2">
           <label>Выбор облачного хранилища</label>
           <select v-model="cloud" class="form-control">
-            <option value="1">Dropbox</option>
+            <option value="1">Яндекс Диск</option>
           </select>
         </div>
       </div>
@@ -123,10 +123,10 @@ const getSize = require('get-folder-size')
 const cronParser = require('cron-parser')
 const isEmpty = require('lodash/isEmpty')
 
-const { periods, getCron } = require('../../enums/periods.js')
-const { algorithms } = require('../../enums/algorithms.js')
-const { mediums } = require('../../enums/mediums.js')
-
+const { periods, getCron } = require('../../enums/periods')
+const { algorithms } = require('../../enums/algorithms')
+const { mediums } = require('../../enums/mediums')
+const encryption = require('../functions/encryption').default
 moment.locale('ru')
 
 export default {
@@ -163,8 +163,6 @@ export default {
       return this.files.reduce((s, c) => s + c.stats.size / 1024 / 1024, 0)
     }
   },
-  mounted () {
-  },
   methods: {
     async create () {
       try {
@@ -174,8 +172,7 @@ export default {
           name: this.name,
           files: this.files,
           algorithm: this.algorithm,
-          // TODO убрать тестовые 30 секунд.
-          datetime: moment().add(30, 'second').format(),
+          datetime: this.datetime,
           cron: this.period === '4' ? this.cron : getCron(this.period),
           destination: this.destination,
           period: this.period,
@@ -187,7 +184,8 @@ export default {
           isCompressed: this.isCompressed
         }
         if (task.isEncrypted) {
-          task.password = await hasha(this.password)
+          const salt = await encryption.generateSalt()
+          task.password = await hasha(this.password + salt).slice(0, 32)
         }
         await this.$db.tasks.insert(task)
         this.$router.back()

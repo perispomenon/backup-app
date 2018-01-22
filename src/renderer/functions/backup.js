@@ -37,9 +37,11 @@ export default {
     console.log(point)
     if (task.isEncrypted) {
       const ivSalt = await encryption.generateSalt()
-      const iv = await encryption.deriveKey(config.ivPassword, ivSalt, config.iterations, 16, 'sha512')
+      const iv = await encryption.deriveKey(config.ivPassword, ivSalt,
+        config.iterations, 16, 'sha512')
       const keySalt = await encryption.generateSalt()
-      const key = await encryption.deriveKey(task.password, keySalt, config.iterations, 32, 'sha512')
+      const key = await encryption.deriveKey(task.password, keySalt,
+        config.iterations, 32, 'sha512')
 
       const archive = await tar.c({ gzip: task.isCompressed }, changedFiles)
       await encryption.do(archive, point.filename + '.enc', key, iv)
