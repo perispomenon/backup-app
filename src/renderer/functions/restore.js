@@ -67,8 +67,8 @@ export default {
 
       if (task.isEncrypted) {
         const points = await db.points.find({})
-        const point = points.find(p => p.taskId === task._id && p.filename === copyName)
-        await this.decrypt(copyName, task, point)
+        const actPoint = points.find(p => p.taskId === task._id && p.filename === copyName)
+        await this.decrypt(copyName, task, actPoint)
       } else {
         await tar.x({ file: copyName, cwd: '/' })
         if (Number(task.medium) === mediums.cloud) {
@@ -80,8 +80,11 @@ export default {
   },
   async decrypt (copyName, task, point) {
     return new Promise(async (resolve, reject) => {
-      const key = await fs.readFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)))
-      const iv = await encryption.deriveKey(config.ivPassword, point.ivSalt, config.iterations, 16, 'sha512')
+      const key = await fs.readFile(path.join(task.keyStorage, '/',
+        getKeyFilename(point.filename)))
+      const iv = await encryption.deriveKey(config.ivPassword, point.ivSalt,
+        config.iterations, 16, 'sha512')
+
       const input = fs.createReadStream(copyName + '.enc')
       const decipher = crypto.createDecipheriv(config.encryptionAlgorithm, key, iv)
       const output = await tar.x({ cwd: '/' })

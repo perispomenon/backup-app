@@ -21,6 +21,9 @@ export default {
   },
   name: 'backup-app',
   async mounted () {
+    this.$bus.on('schedule', async () => {
+      await this.schedule()
+    })
     await this.schedule()
   },
   methods: {
