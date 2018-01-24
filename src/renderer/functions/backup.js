@@ -9,8 +9,10 @@ const db = require('../datastore').default
 const config = require('../../config').default
 const encryption = require('../functions/encryption').default
 const { algorithms } = require('../../enums/algorithms')
-const { getFileHash, getKeyFilename, getYandexUploadUrl } = require('../functions/helpers')
 const { mediums } = require('../../enums/mediums')
+const {
+  getFileHash, getKeyFilename, getYandexUploadUrl, getConfigFilter
+} = require('../functions/helpers')
 
 export default {
   async do (params) {
@@ -33,6 +35,7 @@ export default {
     if (!changedFiles.length) {
       throw new Error('Нет изменений для резервирования')
     }
+    const configFilter = await getConfigFilter()
 
     console.log(point)
     if (task.isEncrypted) {
@@ -43,12 +46,19 @@ export default {
       const key = await encryption.deriveKey(task.password, keySalt,
         config.iterations, 32, 'sha512')
 
-      const archive = await tar.c({ gzip: task.isCompressed }, changedFiles)
+      const archive = await tar.c({
+        gzip: task.isCompressed,
+        filter: (path, stat) => !configFilter.some(cf => path.includes(cf))
+      }, changedFiles)
       await encryption.do(archive, point.filename + '.enc', key, iv)
       await fs.writeFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)), key)
       point.ivSalt = ivSalt
     } else {
-      await tar.c({ file: point.filename, gzip: task.isCompressed }, changedFiles)
+      await tar.c({
+        file: point.filename,
+        gzip: task.isCompressed,
+        filter: (path, stat) => !configFilter.some(cf => path.includes(cf))
+      }, changedFiles)
     }
 
     if (Number(task.medium) === mediums.cloud) {
@@ -57,7 +67,7 @@ export default {
       const uploadUrl = await getYandexUploadUrl(filename)
       const fileContents = await fs.readFile(filename, 'ucs2')
       await axios.put(uploadUrl, fileContents)
-      await fs.remove(point.filename)
+      await fs.remove(filename)
     }
 
     await db.points.insert(point)

@@ -4,6 +4,7 @@ import axios from 'axios'
 import moment from 'moment'
 import { remote } from 'electron'
 import config from '../../config'
+import db from '../datastore'
 
 function getFileHash (filename, attrs) {
   const indicator = filename + attrs.size + attrs.mtime
@@ -49,4 +50,10 @@ function generateFilename (task, pointName) {
   return prefix + '/' + task.name + '_' + pointName + '_' + timestamp + '.mbc'
 }
 
-export { getFileHash, getKeyFilename, getYandexUploadUrl, getYandexDownloadUrl, generateFilename }
+async function getConfigFilter () {
+  const fString = await db.config.find({})
+  const filter = fString[0].filter.split(';')
+  return filter
+}
+
+export { getFileHash, getKeyFilename, getYandexUploadUrl, getYandexDownloadUrl, generateFilename, getConfigFilter }

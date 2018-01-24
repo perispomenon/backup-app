@@ -6,19 +6,19 @@ const userData = remote.app.getPath('userData')
 
 const config = new Datastore({
   autoload: true,
-  filename: path.join(userData, 'config.db'),
+  filename: path.join(userData, './backup-app', 'config.db'),
   timestampData: true
 })
 
 const tasks = new Datastore({
   autoload: true,
-  filename: path.join(userData, 'tasks.db'),
+  filename: path.join(userData, './backup-app', 'tasks.db'),
   timestampData: true
 })
 
 const points = new Datastore({
   autoload: true,
-  filename: path.join(userData, 'points.db'),
+  filename: path.join(userData, './backup-app', 'points.db'),
   timestampData: true
 })
 

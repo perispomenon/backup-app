@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col-xs-8 col-xs-offset-2">
       <div class="form-group">
-        <label>Фильтр (файлы и директории, подходящие под этот фильтр никогда не будут копироваться)
+        <label>Фильтр (через точку с запятой)
         </label>
         <input type="text" class="form-control" v-model="filter">
       </div>
@@ -31,7 +31,9 @@ export default {
   },
   async mounted () {
     await this.$store.dispatch('getSettings')
-    this.filter = this.settings.filter
+    if (this.settings) {
+      this.filter = this.settings.filter
+    }
   },
   methods: {
     async save () {

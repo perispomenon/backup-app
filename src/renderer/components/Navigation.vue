@@ -15,12 +15,12 @@
         </li>
         <li class="divider-vertical"></li>
         <li>
-          <router-link :to="{ name: 'point-backup' }" title="Запустить задачу">
+          <router-link :to="pointBackup" title="Запустить задачу">
             <span class="glyphicon glyphicon-play"></span>
           </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'restore', params: { chosenTask } }" title="Восстановить данные">
+          <router-link :to="restore" title="Восстановить данные">
             <span class="glyphicon glyphicon-hourglass"></span>
           </router-link>
         </li>
@@ -58,7 +58,15 @@ export default {
     ...mapState({
       tasks: state => state.tasks.all,
       chosenTask: state => state.tasks.chosen
-    })
+    }),
+    pointBackup () {
+      if (this.chosenTask) return { name: 'point-backup' }
+      else return '#'
+    },
+    restore () {
+      if (this.chosenTask) return { name: 'restore', params: { chosenTask: this.chosenTask } }
+      else return '#'
+    }
   },
   methods: {
     async removeTask () {
