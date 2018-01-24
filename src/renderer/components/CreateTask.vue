@@ -188,6 +188,7 @@ export default {
           task.password = await hasha(this.password + salt).slice(0, 32)
         }
         await this.$db.tasks.insert(task)
+        this.$bus.emit('schedule')
         this.$router.back()
       } catch (error) {
         console.error(error)

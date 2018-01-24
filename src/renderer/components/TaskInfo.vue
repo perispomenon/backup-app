@@ -35,14 +35,14 @@
       Носитель: <span class="lighter">{{ mediumName }}</span>
     </label>
     <label>
-      {{ Number(this.task.medium) === 1
+      {{ Number(task.medium) === 1
         ? 'Директория хранения: '
         : 'Облако: '
       }}
       <span class="lighter">
-        {{ Number(this.task.medium) === 1
-          ? this.task.destination
-          : this.task.cloud
+        {{ Number(task.medium) === 1
+          ? task.destination
+          : cloudName
         }}
       </span>
     </label>
@@ -66,7 +66,7 @@ import { mapState } from 'vuex'
 import moment from 'moment'
 import algorithms from '../../enums/algorithms.js'
 import periods from '../../enums/periods.js'
-import { getMediumName } from '../../enums/mediums.js'
+import { getMediumName, mediums } from '../../enums/mediums.js'
 
 export default {
   data () {
@@ -113,6 +113,15 @@ export default {
         const latestCreatedAt = moment.max(createdAts)
         const index = createdAts.indexOf(latestCreatedAt)
         return this.points[index]
+      }
+    },
+    cloudName () {
+      if (!this.chosenTask) return null
+      if (Number(this.task.medium) === mediums.cloud) {
+        switch (Number(this.task.cloud)) {
+          case 1:
+            return 'Яндекс Диск'
+        }
       }
     }
   }
