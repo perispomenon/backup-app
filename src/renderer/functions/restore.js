@@ -58,9 +58,11 @@ export default {
   async execute (copyNames, task, point) {
     for (const copyName of copyNames) {
       if (Number(task.medium) === mediums.cloud) {
-        const downloadUrl = await getYandexDownloadUrl(copyName)
+        const filename = task.isEncrypted
+          ? copyName + '.enc' : copyName
+        const downloadUrl = await getYandexDownloadUrl(filename)
         const fileContents = await axios.get(downloadUrl)
-        await fs.writeFile(copyName, fileContents.data)
+        await fs.writeFile(filename, fileContents.data, 'ucs2')
       }
 
       if (task.isEncrypted) {
@@ -70,7 +72,7 @@ export default {
       } else {
         await tar.x({ file: copyName, cwd: '/' })
         if (Number(task.medium) === mediums.cloud) {
-          await fs.remove(copyName)
+          // await fs.remove(copyName)
         }
       }
     }

@@ -52,8 +52,10 @@ export default {
     }
 
     if (Number(task.medium) === mediums.cloud) {
-      const uploadUrl = await getYandexUploadUrl(point.filename)
-      const fileContents = await fs.readFile(point.filename)
+      const filename = task.isEncrypted
+        ? point.filename + '.enc' : point.filename
+      const uploadUrl = await getYandexUploadUrl(filename)
+      const fileContents = await fs.readFile(filename, 'ucs2')
       await axios.put(uploadUrl, fileContents)
       await fs.remove(point.filename)
     }
