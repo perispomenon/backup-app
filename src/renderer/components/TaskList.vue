@@ -51,6 +51,10 @@ export default {
   },
   async mounted () {
     await this.$store.dispatch('getAllTasks')
+    if (this.chosenTask) {
+      const cbx = $(`input[type="checkbox"][value="${this.chosenTask}"]`)
+      cbx.prop('checked', true)
+    }
   },
   methods: {
     deselect () {
@@ -62,6 +66,7 @@ export default {
       const $checkbox = $(`input[type="checkbox"][value="${id}"]`)
       if ($checkbox.is(':checked')) {
         this.$store.commit('TASK_CHOOSE', id)
+        this.deselect()
       } else {
         this.$store.commit('TASK_CHOOSE', null)
       }

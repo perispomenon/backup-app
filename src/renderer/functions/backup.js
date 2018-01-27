@@ -4,6 +4,7 @@ const tar = require('tar')
 const fs = require('fs-extra')
 const dir = require('node-dir')
 const path = require('path')
+const moment = require('moment')
 const axios = require('axios').default
 const db = require('../datastore').default
 const config = require('../../config').default
@@ -71,17 +72,20 @@ export default {
     }
 
     await db.points.insert(point)
-    console.log('created backup')
   },
   async prepareFull (task, point) {
     point.files = await this.mapFiles(task)
   },
   async prepareIncremental (task, point) {
     const points = await db.points.find({ taskId: task._id })
+    let isNextChain = false
+    if (points.length % task.chainLength === 0) {
+      isNextChain = true
+    }
     point.previous = points.length ? points.find(p => p.latest)._id : null
 
     let pointFiles = []
-    if (point.previous) { // Инкрементная копия
+    if (point.previous && !isNextChain) { // Инкрементная копия
       const previousPoint = await db.points.findOne({ _id: point.previous })
       const currentFiles = await this.mapFiles(task)
       pointFiles = this.removeUnchangedFiles(currentFiles, previousPoint.files)
@@ -90,6 +94,8 @@ export default {
       }
     } else { // Полная копия в инкрементной
       pointFiles = await this.mapFiles(task)
+      await db.points.update({ _id: point.previous }, { $set: { latest: false } })
+      point.previous = null
     }
     point.files = pointFiles
     point.latest = true
@@ -97,15 +103,24 @@ export default {
   async prepareDifferential (task, point) {
     // Если есть точка восстановления, у которой нет предыдущей, то это связанная с полной копией.
     const points = await db.points.find({ taskId: task._id, previous: null })
-    point.previous = points.length ? points[0]._id : null
+    const createdAts = points.map(p => moment(p.createdAt))
+    const latestCreatedAt = moment.max(createdAts)
+    const index = createdAts.indexOf(latestCreatedAt)
+    point.previous = points.length ? points[index]._id : null
+    let isNextChain = false
+    const check = await db.points.find({ taskId: task._id })
+    if (check.length % task.chainLength === 0) {
+      isNextChain = true
+    }
 
     let pointFiles = []
-    if (point.previous) { // Дифференциальная копия.
+    if (point.previous && !isNextChain) { // Дифференциальная копия.
       const previousPoint = await db.points.findOne({ _id: point.previous })
       const currentFiles = await this.mapFiles(task)
       pointFiles = this.removeUnchangedFiles(currentFiles, previousPoint.files)
     } else { // Полная копия в дифференциальной.
       pointFiles = await this.mapFiles(task)
+      point.previous = null
     }
     point.files = pointFiles
   },

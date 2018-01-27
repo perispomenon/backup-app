@@ -10,6 +10,9 @@
     <label>
       Алгоритм: <span class="lighter">{{ algorithmName }}</span>
     </label>
+    <label v-if="task.algorithm == 2 || task.algorithm == 3">
+      Длина цепочки копирования: <span class="lighter">{{ task.chainLength }}</span>
+    </label>
     <label>
       Периодичность: <span class="lighter">{{ periodName }}</span>
     </label>
@@ -25,7 +28,7 @@
     <label>
       Шифрование включено: <span class="lighter">{{ isEncryptionOn }}</span>
     </label>
-    <label>
+    <label v-if="task.isEncrypted">
       Место хранения ключа: <span class="lighter">{{ task.keyStorage }}</span>
     </label>
     <label>
@@ -55,7 +58,7 @@
     </ul>
     <div class="form-group">
       <label>Комментарий</label>
-      <textarea class="form-control" readonly rows="3"></textarea>
+      <textarea class="form-control" readonly rows="3" :value="task.note"></textarea>
     </div>
   </div>
 </div>

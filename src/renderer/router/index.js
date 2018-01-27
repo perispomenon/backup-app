@@ -16,6 +16,12 @@ export default new Router({
       component: require('@/components/CreateTask').default
     },
     {
+      path: '/edit-task',
+      name: 'edit-task',
+      component: require('@/components/CreateTask').default,
+      props: { isReadOnly: true }
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: require('@/components/Settings').default

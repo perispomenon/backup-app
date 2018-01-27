@@ -43,17 +43,23 @@ export default {
     if (!point.previous) {
       return [point.filename]
     }
-    const taskPoints = (await db.points.find({ taskId: task._id }))
+    let taskPoints = _((await db.points.find({ taskId: task._id })))
       .filter(tp => tp.createdAt <= point.createdAt)
+      .sortBy('createdAt')
+      .value()
 
-    return _(taskPoints).sortBy('createdAt').value().map(tp => tp.filename)
+    while (taskPoints.length > task.chainLength) {
+      taskPoints.splice(0, task.chainLength)
+    }
+
+    return taskPoints.map(tp => tp.filename)
   },
   async prepareDifferential (point, task) {
     if (!point.previous) {
       return [point.filename]
     }
-    const taskPoints = await db.points.find({ taskId: task._id })
-    return [taskPoints.find(p => !p.previous).filename, point.filename]
+    const previousFull = await db.points.findOne({ _id: point.previous })
+    return [previousFull.filename, point.filename]
   },
   async execute (copyNames, task, point) {
     for (const copyName of copyNames) {
@@ -76,7 +82,6 @@ export default {
         }
       }
     }
-    console.log('restored from backup ')
   },
   async decrypt (copyName, task, point) {
     return new Promise(async (resolve, reject) => {

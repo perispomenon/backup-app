@@ -9,9 +9,9 @@
           </router-link>
         </li>
         <li>
-          <a title="Редактировать задачу">
+          <router-link :to="editTask" title="Редактировать задачу">
             <span class="glyphicon glyphicon-edit"></span>
-          </a>
+          </router-link>
         </li>
         <li class="divider-vertical"></li>
         <li>
@@ -65,6 +65,10 @@ export default {
     },
     restore () {
       if (this.chosenTask) return { name: 'restore', params: { chosenTask: this.chosenTask } }
+      else return '#'
+    },
+    editTask () {
+      if (this.chosenTask) return { name: 'edit-task', params: { chosenTask: this.chosenTask } }
       else return '#'
     }
   },

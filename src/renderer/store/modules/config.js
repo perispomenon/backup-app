@@ -21,7 +21,10 @@ const actions = {
       await db.config.insert(newSettings)
     } else {
       await db.config.update({ _id: prevSettings[0]._id }, {
-        $set: { filter: newSettings.filter }
+        $set: {
+          filter: newSettings.filter,
+          chainLength: newSettings.chainLength
+        }
       })
     }
   }

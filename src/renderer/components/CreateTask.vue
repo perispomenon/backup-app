@@ -16,11 +16,15 @@
       </div>
       <div class="form-group">
         <label>Алгоритм копирования:</label>
-        <select v-model="algorithm" class="form-control">
+        <select v-model="algorithm" class="form-control" :disabled="isReadOnly">
           <option value="1">Полное копирование</option>
           <option value="2">Инкрементное копирование</option>
           <option value="3">Дифференциальное копирование</option>
         </select>
+      </div>
+      <div class="form-group" v-if="algorithm == 2 || algorithm == 3">
+        <label>Длина цепочки копирования</label>
+        <input type="number" v-model="chainLength" class="form-control" :readonly="isReadOnly">
       </div>
       <div class="form-group">
         <label>Периодичность копирования</label>
@@ -37,7 +41,7 @@
       </div>
       <div class="form-group">
         <label>Носитель</label>
-        <select v-model="medium" class="form-control">
+        <select v-model="medium" class="form-control" :disabled="isReadOnly">
           <option value="1">Локальный диск или устройство</option>
           <option value="2">Облако</option>
         </select>
@@ -61,31 +65,30 @@
       </div>
       <div class="form-group cbx">
         <input type="checkbox" v-model="isCompressed">
-        <label>Сжимать резервные копии
-          <span class="glyphicon glyphicon-info-sign"></span>
-        </label>
+        <label>Сжимать резервные копии</label>
       </div>
-      <div class="form-group cbx">
-        <input type="checkbox" v-model="isEncrypted">
-        <label>Шифровать резервные копии
-          <span class="glyphicon glyphicon-info-sign"></span>
-        </label>
-      </div>
-      <div class="form-group" v-if="isEncrypted">
-        <label>Выбор устройства для хранения ключа шифрования</label>
-          <div class="input-group">
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="button" @click="chooseKeyStorage">Выбрать</button>
-            </span>
-            <input type="text" class="form-control" disabled v-model="keyStorage">
+      <template v-if="!isReadOnly">
+        <div class="form-group cbx">
+          <input type="checkbox" v-model="isEncrypted">
+          <label>Шифровать резервные копии</label>
         </div>
-      </div>
-      <div class="form-group" v-if="isEncrypted">
-        <label>Пароль для генерации ключа шифрования</label>
-        <input type="text" class="form-control" v-model="password">
-      </div>
+        <div class="form-group" v-if="isEncrypted">
+          <label>Выбор устройства для хранения ключа шифрования</label>
+            <div class="input-group">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" @click="chooseKeyStorage">Выбрать</button>
+              </span>
+              <input type="text" class="form-control" disabled v-model="keyStorage">
+          </div>
+        </div>
+        <div class="form-group" v-if="isEncrypted">
+          <label>Пароль для генерации ключа шифрования</label>
+          <input type="text" class="form-control" v-model="password">
+        </div>
+      </template>
       <button @click="$router.back()" class="btn btn-danger">Назад</button>
-      <button @click="create" class="btn btn-primary pull-right">Создать задачу</button>
+      <button v-if="isReadOnly" @click="edit" class="btn btn-primary pull-right">Сохранить задачу</button>
+      <button v-else @click="create" class="btn btn-primary pull-right">Сохранить задачу</button>
     </div>
     <div class="col-xs-6">
       <h4 class="text-center">Файлы и директории для копирования</h4>
@@ -95,7 +98,7 @@
           <h5>Выбрано:
             <a title="Добавить файлы" @click="chooseFiles('file')" class="pull-right choice-items"><span class="glyphicon glyphicon-file"></span></a>
             <a title="Добавить директории" @click="chooseFiles('dir')" class="pull-right choice-items"><span class="glyphicon glyphicon-folder-open"></span></a>
-            <a title="Удалить" @click="clearSelection" class="pull-right choice-items"><span class="glyphicon glyphicon-remove"></span></a>
+            <a v-if="!isReadOnly" title="Удалить" @click="clearSelection" class="pull-right choice-items"><span class="glyphicon glyphicon-remove"></span></a>
           </h5>
         </div>
         <div class="panel-body">
@@ -107,6 +110,10 @@
         <div class="panel-footer">
           <label>Общий размер: {{ selectedFilesSize.toFixed(2) }} МБ</label>
         </div>
+      </div>
+      <div class="form-group">
+        <label>Комментарий</label>
+        <textarea class="form-control" rows="3" v-model="note"></textarea>
       </div>
     </div>
   </div>
@@ -122,6 +129,7 @@ const validator = require('validator')
 const getSize = require('get-folder-size')
 const cronParser = require('cron-parser')
 const isEmpty = require('lodash/isEmpty')
+const { mapState } = require('vuex')
 
 const { periods, getCron } = require('../../enums/periods')
 const { algorithms } = require('../../enums/algorithms')
@@ -144,10 +152,15 @@ export default {
       isEncrypted: false,
       keyStorage: null,
       isCompressed: false,
-      password: null
+      password: null,
+      chainLength: null,
+      note: null
     }
   },
   computed: {
+    ...mapState({
+      settings: state => state.config.settings
+    }),
     datetime () {
       switch (Number(this.period)) {
         case periods.everyDay:
@@ -161,6 +174,18 @@ export default {
     },
     selectedFilesSize () {
       return this.files.reduce((s, c) => s + c.stats.size / 1024 / 1024, 0)
+    }
+  },
+  async mounted () {
+    if (this.$route.params.chosenTask && this.isReadOnly) {
+      const task = await this.$db.tasks.findOne({ _id: this.$route.params.chosenTask })
+      Object.keys(this.$data).forEach(key => {
+        this.$data[key] = task[key]
+      })
+    }
+    await this.$store.dispatch('getSettings')
+    if (this.settings) {
+      this.chainLength = this.settings.chainLength
     }
   },
   methods: {
@@ -181,7 +206,9 @@ export default {
           totalSize: this.selectedFilesSize,
           isEncrypted: this.isEncrypted,
           keyStorage: this.keyStorage,
-          isCompressed: this.isCompressed
+          isCompressed: this.isCompressed,
+          chainLength: this.chainLength,
+          note: this.note
         }
         if (task.isEncrypted) {
           const salt = await encryption.generateSalt()
@@ -189,7 +216,7 @@ export default {
         }
         await this.$db.tasks.insert(task)
         this.$bus.emit('schedule')
-        this.$router.back()
+        this.$router.push({ name: 'landing-page' })
       } catch (error) {
         console.error(error)
         this.flash(error.message, 'error', { timeout: 5000 })
@@ -256,6 +283,13 @@ export default {
         if (!isEmpty(cronValidation.errors)) { throw new Error('Введите cron в правильном формате') }
       }
 
+      if (this.algorithm === algorithms.incremental ||
+        this.algorithm === algorithms.differential) {
+        if (!this.chainLength || this.chainLength === 1) {
+          throw new Error('Длина цепочки должна быть больше 1')
+        }
+      }
+
       if (Number(this.medium) === mediums.local) {
         if (!this.destination) { throw new Error('Выберите место хранения резервных копий') }
       }
@@ -274,6 +308,30 @@ export default {
       }
 
       if (!this.files.length) { throw new Error('Не выбраны файлы для резервирования') }
+    },
+    async edit () {
+      try {
+        this.validate()
+        const $set = {
+          name: this.name,
+          files: this.files,
+          datetime: this.datetime,
+          cron: this.period === '4' ? this.cron : getCron(this.period),
+          destination: this.destination,
+          period: this.period,
+          totalSize: this.selectedFilesSize,
+          isCompressed: this.isCompressed,
+          note: this.note
+        }
+
+        await this.$db.tasks.update({ _id: this.$route.params.chosenTask }, { $set })
+        this.$bus.emit('schedule')
+        this.$router.push({ name: 'landing-page' })
+        this.flash('Задача обновлена', 'success', { timeout: 3000 })
+      } catch (error) {
+        console.error(error)
+        this.flash(error.message, 'error', { timeout: 3000 })
+      }
     }
   }
 }
