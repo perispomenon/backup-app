@@ -24,6 +24,11 @@
             <span class="glyphicon glyphicon-hourglass"></span>
           </router-link>
         </li>
+        <li>
+          <router-link :to="managePoints" title="Управление точками восстановления">
+            <span class="glyphicon glyphicon-list-alt"></span>
+          </router-link>
+        </li>
         <li class="divider-vertical"></li>
         <li style="cursor: pointer">
           <a title="Удалить задачу" @click="removeTask"><span class="glyphicon glyphicon-trash"></span></a>
@@ -48,6 +53,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import fs from 'fs-extra'
 import Settings from '@/components/Settings'
 
 export default {
@@ -64,16 +70,34 @@ export default {
       else return '#'
     },
     restore () {
-      if (this.chosenTask) return { name: 'restore', params: { chosenTask: this.chosenTask } }
-      else return '#'
+      if (this.chosenTask) {
+        return { name: 'restore', params: { chosenTask: this.chosenTask } }
+      } else return '#'
     },
     editTask () {
-      if (this.chosenTask) return { name: 'edit-task', params: { chosenTask: this.chosenTask } }
-      else return '#'
+      if (this.chosenTask) {
+        return { name: 'edit-task', params: { chosenTask: this.chosenTask } }
+      } else return '#'
+    },
+    managePoints () {
+      if (this.chosenTask) {
+        return { name: 'manage-points', params: { chosenTask: this.chosenTask } }
+      } else return '#'
     }
   },
   methods: {
     async removeTask () {
+      const points = await this.$db.points.find({ taskId: this.chosenTask })
+      const task = this.tasks.find(t => t._id === this.chosenTask)
+      for (const point of points) {
+        const filename = task.isEncrypted
+          ? point.filename + '.enc'
+          : point.filename
+        if (fs.existsSync(filename)) {
+          await fs.remove(filename)
+        }
+        await this.$db.points.remove({ _id: point._id })
+      }
       await this.$db.tasks.remove({ _id: this.chosenTask })
       await this.$store.dispatch('getAllTasks')
     }

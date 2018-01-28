@@ -1,12 +1,14 @@
 import db from '../../datastore'
+import sortBy from 'lodash/sortBy'
 
 const state = {
-  taskPoints: []
+  taskPoints: [],
+  taskPointsForManage: []
 }
 
 const mutations = {
   POINTS_BY_TASK (state, points) {
-    state.taskPoints = points
+    state.taskPoints = sortBy(points, 'createdAt')
   }
 }
 

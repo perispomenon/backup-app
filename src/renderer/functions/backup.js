@@ -54,12 +54,14 @@ export default {
       await encryption.do(archive, point.filename + '.enc', key, iv)
       await fs.writeFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)), key)
       point.ivSalt = ivSalt
+      point.filesize = fs.lstatSync(point.filename + '.enc').size / 1024 / 1024
     } else {
       await tar.c({
         file: point.filename,
         gzip: task.isCompressed,
         filter: (path, stat) => !configFilter.some(cf => path.includes(cf))
       }, changedFiles)
+      point.filesize = fs.lstatSync(point.filename).size / 1024 / 1024
     }
 
     if (Number(task.medium) === mediums.cloud) {

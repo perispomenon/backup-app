@@ -164,12 +164,12 @@ export default {
     datetime () {
       switch (Number(this.period)) {
         case periods.everyDay:
-          return moment().add(1, 'day').format('YYYY-MM-DDThh:mm')
+          return moment().add(1, 'day').format()
         case periods.everyWeek:
         case periods.manually:
-          return moment().add(1, 'week').format('YYYY-MM-DDThh:mm')
+          return moment().add(1, 'week').format()
         case periods.everyMonth:
-          return moment().add(1, 'month').format('YYYY-MM-DDThh:mm')
+          return moment().add(1, 'month').format()
       }
     },
     selectedFilesSize () {

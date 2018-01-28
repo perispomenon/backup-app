@@ -14,14 +14,6 @@
         </select>
       </div>
     </div>
-    <!-- TODO показывать инфу о точках восстановления -->
-    <!-- <div class="col-xs-5 col-xs-offset-7" v-if="selectedPoint">
-      <ul>
-        <li v-for="file in taskPoints.find(tp => tp._id === selectedPoint).files" :key="file.name">
-          {{ file.name }}
-        </li>
-      </ul>
-    </div> -->
   </div>
   <div>
     <button class="btn btn-danger" @click="$router.back()">Отмена</button>

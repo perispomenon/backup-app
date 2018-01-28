@@ -23,7 +23,7 @@
       Последняя точка восстановления: <span class="lighter">{{ latestPoint.name }}</span>
     </label>
     <label v-if="latestPoint">
-      Последнее резервное копирование: <span class="lighter">{{ new Date(latestPoint.createdAt).toLocaleString() }}</span>
+      Последнее резервное копирование: <span class="lighter">{{ new Date(latestPoint.createdAt).toLocaleString('ru') }}</span>
     </label>
     <label>
       Шифрование включено: <span class="lighter">{{ isEncryptionOn }}</span>

@@ -35,6 +35,11 @@ export default new Router({
       path: '/point-backup',
       name: 'point-backup',
       component: require('@/components/PointBackup').default
+    },
+    {
+      path: '/manage-points',
+      name: 'manage-points',
+      component: require('@/components/ManagePoints').default
     }
   ]
 })

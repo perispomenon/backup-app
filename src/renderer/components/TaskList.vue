@@ -33,6 +33,8 @@
 import $ from 'jquery'
 import { mapState } from 'vuex'
 import { progressbar } from 'vue-strap'
+import moment from 'moment'
+moment.locale('ru')
 
 export default {
   components: {

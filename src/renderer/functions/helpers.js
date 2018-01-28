@@ -33,7 +33,6 @@ async function getYandexUploadUrl (fullFilename) {
 async function getYandexDownloadUrl (fullFilename) {
   const parts = fullFilename.split('/')
   const filename = parts[parts.length - 1]
-  console.log(`https://cloud-api.yandex.net/v1/disk/resources/download?path=${config.yandexAppPrefix}${filename}`)
   const downloadUrl = await axios.request({
     url: `https://cloud-api.yandex.net/v1/disk/resources/download?path=${config.yandexAppPrefix}${filename}`,
     method: 'get',
