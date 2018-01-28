@@ -5,6 +5,7 @@ const fs = require('fs-extra')
 const dir = require('node-dir')
 const path = require('path')
 const moment = require('moment')
+const isOnline = require('is-online')
 const axios = require('axios').default
 const db = require('../datastore').default
 const config = require('../../config').default
@@ -19,6 +20,13 @@ export default {
   async do (params) {
     const task = params.task
     const point = this.prepareAny(params)
+    if (Number(task.medium) === mediums.cloud) {
+      isOnline().then((online) => {
+        if (!online) {
+          throw new Error('Нет подключения к интернету')
+        }
+      })
+    }
 
     switch (Number(task.algorithm)) {
       case algorithms.full:
@@ -39,6 +47,12 @@ export default {
     const configFilter = await getConfigFilter()
 
     console.log(point)
+    const tarOptions = {
+      gzip: task.isCompressed
+    }
+    if (configFilter) {
+      tarOptions.filter = (path, stat) => !configFilter.some(cf => path.includes(cf))
+    }
     if (task.isEncrypted) {
       const ivSalt = await encryption.generateSalt()
       const iv = await encryption.deriveKey(config.ivPassword, ivSalt,
@@ -47,20 +61,14 @@ export default {
       const key = await encryption.deriveKey(task.password, keySalt,
         config.iterations, 32, 'sha512')
 
-      const archive = await tar.c({
-        gzip: task.isCompressed,
-        filter: (path, stat) => !configFilter.some(cf => path.includes(cf))
-      }, changedFiles)
+      const archive = await tar.c(tarOptions, changedFiles)
       await encryption.do(archive, point.filename + '.enc', key, iv)
       await fs.writeFile(path.join(task.keyStorage, '/', getKeyFilename(point.filename)), key)
       point.ivSalt = ivSalt
       point.filesize = fs.lstatSync(point.filename + '.enc').size / 1024 / 1024
     } else {
-      await tar.c({
-        file: point.filename,
-        gzip: task.isCompressed,
-        filter: (path, stat) => !configFilter.some(cf => path.includes(cf))
-      }, changedFiles)
+      tarOptions.file = point.filename
+      await tar.c(tarOptions, changedFiles)
       point.filesize = fs.lstatSync(point.filename).size / 1024 / 1024
     }
 
@@ -70,7 +78,7 @@ export default {
       const uploadUrl = await getYandexUploadUrl(filename)
       const fileContents = await fs.readFile(filename, 'ucs2')
       await axios.put(uploadUrl, fileContents)
-      await fs.remove(filename)
+      // await fs.remove(filename)
     }
 
     await db.points.insert(point)

@@ -51,8 +51,12 @@ function generateFilename (task, pointName) {
 
 async function getConfigFilter () {
   const fString = await db.config.find({})
-  const filter = fString[0].filter.split(';')
-  return filter
+  if (fString.length) {
+    const filter = fString[0].filter.split(';')
+    return filter
+  } else {
+    return null
+  }
 }
 
 export { getFileHash, getKeyFilename, getYandexUploadUrl, getYandexDownloadUrl, generateFilename, getConfigFilter }

@@ -23,7 +23,7 @@
           <tbody :key="point._id">
             <tr>
               <td>
-                <a title="Восстановить из точки восстановления" @click="restore(point._id)"><span class="glyphicon glyphicon-play"></span></a>
+                <a title="Восстановить из точки восстановления" @click="restore(point._id)"><span class="glyphicon glyphicon-hourglass"></span></a>
               </td>
               <td>
                 <a title="Удалить точку восстановления" @click="remove(point._id)"><span class="glyphicon glyphicon-trash"></span></a>
@@ -31,7 +31,11 @@
               <td>{{ point.name }}</td>
               <td>{{ new Date(point.createdAt).toLocaleString('ru') }}</td>
               <td>{{ point.filesize.toFixed(2) }}</td>
-              <td>{{ point.filename  }}</td>
+              <td>
+                {{ Number(task.medium) === 2
+                    ? 'Файл в облаке'
+                    : point.filename}}
+              </td>
             </tr>
           </tbody>
         </template>
@@ -103,5 +107,9 @@ input[type="checkbox"] {
 table td a {
   font-size: 1.3em;
   cursor: pointer;
+}
+table td:first-child, table td:nth-child(2) {
+  padding-left: 1px;
+  padding-right: 1px;
 }
 </style>

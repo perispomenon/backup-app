@@ -5,6 +5,7 @@ import fs from 'fs-extra'
 import crypto from 'crypto'
 import path from 'path'
 import axios from 'axios'
+import isOnline from 'is-online'
 import db from '../datastore'
 import { algorithms } from '../../enums/algorithms'
 import { mediums } from '../../enums/mediums'
@@ -15,6 +16,13 @@ import { getKeyFilename, getYandexDownloadUrl } from '../functions/helpers'
 export default {
   async do (pointId) {
     const { point, task } = await this.getRestoreData(pointId)
+    if (Number(task.medium) === mediums.cloud) {
+      isOnline().then((online) => {
+        if (!online) {
+          throw new Error('Нет подключения к интернету')
+        }
+      })
+    }
 
     let copyNames = []
     switch (Number(task.algorithm)) {
@@ -67,8 +75,7 @@ export default {
         const filename = task.isEncrypted
           ? copyName + '.enc' : copyName
         const downloadUrl = await getYandexDownloadUrl(filename)
-        const fileContents = await axios.get(downloadUrl)
-        await fs.writeFile(filename, fileContents.data, 'ucs2')
+        await axios.get(downloadUrl)
       }
 
       if (task.isEncrypted) {

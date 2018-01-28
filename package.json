@@ -1,6 +1,6 @@
 {
   "name": "backup-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "Tolik <nullus.aspectus@gmail.com>",
   "description": "An electron-vue project",
   "license": null,
@@ -60,6 +60,7 @@
     "get-folder-size": "^1.0.0",
     "hasha": "^3.0.0",
     "he": "^1.1.1",
+    "is-online": "^7.0.0",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.19.1",
