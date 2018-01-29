@@ -215,6 +215,7 @@ export default {
           task.password = await hasha(this.password + salt).slice(0, 32)
         }
         await this.$db.tasks.insert(task)
+        this.flash('Задача создана', 'success', { timeout: 3000 })
         this.$bus.emit('schedule')
         this.$router.push({ name: 'landing-page' })
       } catch (error) {

@@ -52,10 +52,12 @@ function generateFilename (task, pointName) {
 async function getConfigFilter () {
   const fString = await db.config.find({})
   if (fString.length) {
-    const filter = fString[0].filter.split(';')
-    return filter
-  } else {
-    return null
+    if (fString.filter) {
+      const filter = fString[0].filter.split(';')
+      return filter
+    } else {
+      return null
+    }
   }
 }
 
