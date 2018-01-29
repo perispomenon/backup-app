@@ -83,7 +83,7 @@
         </div>
         <div class="form-group" v-if="isEncrypted">
           <label>Пароль для генерации ключа шифрования</label>
-          <input type="text" class="form-control" v-model="password">
+          <input type="password" class="form-control" v-model="password">
         </div>
       </template>
       <button @click="$router.back()" class="btn btn-danger">Назад</button>

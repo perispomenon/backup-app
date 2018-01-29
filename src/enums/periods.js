@@ -20,7 +20,6 @@ function getPeriodName (id) {
   }
 }
 
-// FOR TESTING YET
 function getCron (id) {
   switch (Number(id)) {
     case 1:
